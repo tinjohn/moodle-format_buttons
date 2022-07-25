@@ -153,7 +153,7 @@ class format_buttons_renderer extends format_topics_renderer
         $count = 1;
         $currentdivisor = 1;
         $modinfo = get_fast_modinfo($course);
-        $inline = '';
+        $inline = 'TINAAAA - taucht im HTML auf aber wird nicht angezeigt Ids identisch??';
         foreach ($modinfo->get_section_info_all() as $section => $thissection) {
             if ($section == 0) {
                 continue;
@@ -174,6 +174,7 @@ class format_buttons_renderer extends format_topics_renderer
                 !isset($divisorshow[$currentdivisor])) {
                 $currentdivisorhtml = format_string($course->{'divisortext' . $currentdivisor});
                 $currentdivisorhtml = str_replace('[br]', '<br>', $currentdivisorhtml);
+                $currentdivisorstring = $currentdivisorhtml;
                 $currentdivisorhtml = html_writer::tag('div', $currentdivisorhtml, ['class' => 'divisortext']);
                 if ($course->inlinesections) {
                     $inline = 'inlinebuttonsections';
@@ -220,6 +221,136 @@ class format_buttons_renderer extends format_topics_renderer
             $count++;
         }
         $html = html_writer::tag('div', $html, ['id' => 'buttonsectioncontainer', 'class' => $course->buttonstyle]);
+        if ($PAGE->user_is_editing()) {
+            $html .= html_writer::tag('div', get_string('editing', 'format_buttons'), ['class' => 'alert alert-warning alert-block fade in']);
+        }
+        return $html;
+    }
+
+
+
+    /**
+     * Get_button_section
+     *
+     * @param stdclass $course
+     * @param string $sectionvisible
+     * @return string
+     */
+    protected function get_button_section_bottom ($course, $sectionvisible) {
+        global $PAGE;
+        $html = '';
+        $css = '';
+        if ($colorcurrent = $this->get_color_config($course, 'colorcurrent')) {
+            $css .=
+            '#bottombuttonsectioncontainer .buttonsection.current {
+                background: ' . $colorcurrent . ';
+            }
+            ';
+        }
+        if ($colorvisible = $this->get_color_config($course, 'colorvisible')) {
+            $css .=
+            '#bottombuttonsectioncontainer .buttonsection.sectionvisible {
+                background: ' . $colorvisible . ';
+            }
+            ';
+        }
+        if ($css) {
+            $html .= html_writer::tag('style', $css);
+        }
+        $withoutdivisor = true;
+        for ($k = 1; $k <= 12; $k++) {
+            if ($course->{'divisor' . $k}) {
+                $withoutdivisor = false;
+            }
+        }
+        if ($withoutdivisor) {
+            $course->divisor1 = 999;
+        }
+        $divisorshow = false;
+        $count = 1;
+        $currentdivisor = 1;
+        $modinfo = get_fast_modinfo($course);
+        $inline = 'TINAAAA - Bottombuttons';
+        foreach ($modinfo->get_section_info_all() as $section => $thissection) {
+            if ($section == 0) {
+                continue;
+            }
+            if ($section > $course->numsections) {
+                continue;
+            }
+            if ($course->hiddensections && !(int)$thissection->visible) {
+                continue;
+            }
+            if (isset($course->{'divisor' . $currentdivisor}) &&
+                $count > $course->{'divisor' . $currentdivisor}) {
+                $currentdivisor++;
+                $count = 1;
+            }
+            if (isset($course->{'divisor' . $currentdivisor}) &&
+                $course->{'divisor' . $currentdivisor} != 0 &&
+                !isset($divisorshow[$currentdivisor])) {
+                $currentdivisorhtml = format_string($course->{'divisortext' . $currentdivisor});
+                $currentdivisorhtml = str_replace('[br]', '<br>', $currentdivisorhtml);
+                $currentdivisorstring = $currentdivisorhtml;
+
+                $currentdivisorhtml = html_writer::tag('div', $currentdivisorhtml, ['class' => 'divisortext']);
+                if ($course->inlinesections) {
+                    $inline = 'inlinebuttonsections';
+                }
+                //$html .= html_writer::tag('div', $currentdivisorhtml, ['class' => "divisorsection $inline"]);
+                $divisorshow[$currentdivisor] = true;
+            }
+            $id = 'bottombuttonsection-' . $section;
+            if ($course->sequential) {
+                $name = $section;
+            } else {
+                if (isset($course->{'divisor' . $currentdivisor}) &&
+                $course->{'divisor' . $currentdivisor} == 1) {
+                    $name = '&bull;&bull;&bull;';
+                } else {
+                    $name = $count;
+                }
+            }
+            if ($course->sectiontype == 'alphabet' && is_numeric($name)) {
+                $name = $this->number_to_alphabet($name);
+            }
+            if ($course->sectiontype == 'roman' && is_numeric($name)) {
+                $name = $this->number_to_roman($name);
+            }
+            $class = 'buttonsection';
+            $onclick = 'M.format_buttons.show(' . $section . ',' . $course->id . ')';
+            if (!$thissection->available &&
+                !empty($thissection->availableinfo)) {
+                $class .= ' sectionhidden';
+            } else if (!$thissection->uservisible || !$thissection->visible) {
+                $class .= ' sectionhidden';
+                $onclick = false;
+            }
+            if ($course->marker == $section) {
+                $class .= ' current';
+            }
+
+            if ($sectionvisible == $section) {
+                $class .= ' sectionvisible';
+            } elseif ($sectionvisible - 1 == $section) {
+                $class .= ' sectionbeforevisible';
+            } elseif ($sectionvisible + 1  == $section) {
+                $class .= ' sectionaftervisible';
+            } else {
+              $class .= ' sectionnotvisible';
+            }
+            if ($PAGE->user_is_editing()) {
+                $onclick = false;
+            }
+            if($count == 1) {
+              $arspan = html_writer::tag('div', "", ['id' => '', 'class' => 'divisorline']);
+               $name = $arspan.''.$name;
+            }
+
+            $html .= html_writer::tag('div', $name, ['id' => $id, 'class' => $class, 'onclick' => $onclick]);
+            $count++;
+        }
+        $html = html_writer::tag('div', $html, ['id' => 'bottombuttonsectioncontainer', 'class' => $course->buttonstyle]);
         if ($PAGE->user_is_editing()) {
             $html .= html_writer::tag('div', get_string('editing', 'format_buttons'), ['class' => 'alert alert-warning alert-block fade in']);
         }
@@ -416,6 +547,9 @@ class format_buttons_renderer extends format_topics_renderer
         } else {
             echo $this->end_section_list();
         }
+        // tinjohn 2022-07-21
+        echo $this->get_button_section_bottom($course, $sectionvisible);
+
         if (!$PAGE->user_is_editing()) {
             $PAGE->requires->js_init_call('M.format_buttons.init', [$course->numsections, $sectionvisible, $course->id]);
         }

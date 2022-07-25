@@ -31,6 +31,7 @@ M.format_buttons.init = function(Y, numsections, currentsection, courseid) {
     this.ourYUI = Y;
     this.numsections = parseInt(numsections);
     document.getElementById('buttonsectioncontainer').style.display = 'table';
+    document.getElementById('bottombuttonsectioncontainer').style.display = 'table';
 
     var findHash = function (href) {
         var id = null;
@@ -49,6 +50,9 @@ M.format_buttons.init = function(Y, numsections, currentsection, courseid) {
     if (currentsection) {
         M.format_buttons.show(currentsection, courseid);
     }
+    // for (var i = 1; i <= this.numsections; i++) {
+    //   M.format_buttons.show(i, courseid);
+    // }
 
     Y.delegate('click', function (e) {
         var href = e.currentTarget.get('href');
@@ -60,9 +64,13 @@ M.format_buttons.init = function(Y, numsections, currentsection, courseid) {
 
 M.format_buttons.hide = function() {
     for (var i = 1; i <= this.numsections; i++) {
-        if (document.getElementById('buttonsection-' + i) != undefined) {
+        if (document.getElementById('buttonsection-' + i) != undefined && document.getElementById('bottombuttonsection-' + i) != undefined) {
             var buttonsection = document.getElementById('buttonsection-' + i);
             buttonsection.setAttribute('class', buttonsection.getAttribute('class').replace('sectionvisible', ''));
+            var bottombuttonsection = document.getElementById('bottombuttonsection-' + i);
+            bottombuttonsection.setAttribute('class', bottombuttonsection.getAttribute('class').replace('sectionvisible', 'sectionnotvisible'));
+            bottombuttonsection.setAttribute('class', bottombuttonsection.getAttribute('class').replace('sectionaftervisible', 'sectionnotvisible'));
+            bottombuttonsection.setAttribute('class', bottombuttonsection.getAttribute('class').replace('sectionbeforevisible', 'sectionnotvisible'));
             document.getElementById('section-' + i).style.display = 'none';
         }
     }
@@ -70,14 +78,33 @@ M.format_buttons.hide = function() {
 
 M.format_buttons.show = function(id, courseid) {
     this.hide();
+    id = parseInt(id);
     if (id > 0) {
         var buttonsection = document.getElementById('buttonsection-' + id);
+        var bottombuttonsection = document.getElementById('bottombuttonsection-' + id);
         var currentsection = document.getElementById('section-' + id);
         if (buttonsection && currentsection) {
             buttonsection.setAttribute('class', buttonsection.getAttribute('class') + ' sectionvisible');
+            bottombuttonsection.setAttribute('class', bottombuttonsection.getAttribute('class').replace('sectionnotvisible', 'sectionvisible'));
             currentsection.style.display = 'block';
             document.cookie = 'sectionvisible_' + courseid + '=' + id + '; path=/';
             M.format_buttons.h5p();
+
+        }
+
+        if (id > 1) {
+          var beforeid = id - 1;
+          var bottombuttonsectionbefore = document.getElementById('bottombuttonsection-' + beforeid );
+          if(bottombuttonsectionbefore) {
+            bottombuttonsectionbefore.setAttribute('class', bottombuttonsectionbefore.getAttribute('class').replace('sectionnotvisible', 'sectionbeforevisible'));
+          }
+        }
+        if (id < this.numsections) {
+          var afterid = id + 1;
+          var bottombuttonsectionnext = document.getElementById('bottombuttonsection-' + afterid );
+          if(bottombuttonsectionnext) {
+            bottombuttonsectionnext.setAttribute('class', bottombuttonsectionnext.getAttribute('class').replace('sectionnotvisible', 'sectionaftervisible'));
+          }
         }
     }
 };

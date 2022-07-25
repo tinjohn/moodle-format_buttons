@@ -64,7 +64,7 @@
     border: 0 !important;
 }
 
-#buttonsectioncontainer {
+#buttonsectioncontainer, #bottombuttonsectioncontainer {
     display: none;
     margin: 20px auto;
 }
@@ -85,6 +85,28 @@
     margin: 0 5px 10px 5px;
     vertical-align: top;
 }
+#bottombuttonsectioncontainer .buttonsection {
+  /*  background: #dee3e8; */
+    color: #7a8188;
+    display: inline-block;
+    text-align: center;
+    width: 28px;
+    line-height: 28px;
+    height: 28px;
+    overflow: hidden;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 0;
+    font-weight: 500;
+    margin: 0 5px 10px 5px;
+    vertical-align: top;
+    border-radius: 100%;
+    color: #1177d1;
+/*    border-color: #1177d1;
+    background: #1177d1;*/
+
+}
+
 
 #buttonsectioncontainer.circle .buttonsection {
     border-radius: 100%;
@@ -126,6 +148,26 @@
     text-align: right;
     color: rgba(0, 0, 0, 0.6);
 }
+#bottombuttonsectioncontainer .divisorsection {
+    display: inline-block;
+    padding: 0;
+    overflow-y: hidden;
+    height: 52px;
+    margin: 0 4px 10px 25px;
+}
+
+#bottombuttonsectioncontainer .divisortext {
+    display: table-cell;
+    vertical-align: middle;
+    padding: 0;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 18px;
+    overflow-y: hidden;
+    height: 52px;
+    text-align: right;
+    color: rgba(0, 0, 0, 0.6);
+}
 
 /* colors */
 #buttonsectioncontainer .buttonsection.current {
@@ -138,8 +180,60 @@
     color: #fff;
     border-color: #1177d1;
 }
+#bottombuttonsectioncontainer .buttonsection.sectionvisible {
+    background: #1177d1;
+    color: #fff;
+    border-color: #1177d1;
+}
+#bottombuttonsectioncontainer .buttonsection.sectionnotvisible {
+  /* display: none; */
+  display: none;
+}
+
+#bottombuttonsectioncontainer .buttonsection.sectionbeforevisible {
+  /* content: url([[pix:format_buttons|OCP_beforeArrow]]); */
+  /*  background: #1177d1; */
+    color: #1177d1;
+    color: #fff;
+    border-color: #1177d1;
+    border-radius: 100%;
+}
+
+#bottombuttonsectioncontainer .buttonsection.sectionbeforevisible:after {
+    content: "◀︎";
+    content: url([[pix:format_buttons|OCP_beforeArrow]]);
+  /*  background: #1177d1; */
+    color: #1177d1;
+    border-color: #1177d1;
+    border-radius: 100%;
+
+}
+#bottombuttonsectioncontainer .buttonsection.sectionaftervisible {
+    /* content: url([[pix:format_buttons|OCP_nextArrow]]); */
+    color: #1177d1;
+    color: #fff;
+    border-color: #1177d1;
+    border-radius: 100%;
+}
+
+#bottombuttonsectioncontainer .divisorline:before {
+  /* content: url([[pix:format_buttons|OCP_nextBar]])); */
+}
+#bottombuttonsectioncontainer .buttonsection.sectionaftervisible:before {
+    content: "▶︎";
+    /* content: url([[pix:format_buttons|OCP_nextArrow]]); */
+
+    /*  background: #1177d1; */
+    color: #1177d1;
+    border-color: #1177d1;
+    border-radius: 100%;
+
+}
 
 #buttonsectioncontainer .divisorsection.inlinebuttonsections {
+    display: inline;
+}
+#bottombuttonsectioncontainer .divisorsection.inlinebuttonsections {
     display: inline;
 }
 
