@@ -342,10 +342,10 @@ class format_buttons_renderer extends format_topics_renderer
             if ($PAGE->user_is_editing()) {
                 $onclick = false;
             }
-            if($count == 1) {
-              $arspan = html_writer::tag('div', "", ['id' => '', 'class' => 'divisorline']);
-               $name = $arspan.''.$name;
-            }
+            // if($count == 1) {
+            //   $arspan = html_writer::tag('div', "", ['id' => '', 'class' => 'divisorline']);
+            //    $name = $arspan.''.$name;
+            // }
 
             $html .= html_writer::tag('div', $name, ['id' => $id, 'class' => $class, 'onclick' => $onclick]);
             $count++;

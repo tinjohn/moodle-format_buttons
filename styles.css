@@ -200,13 +200,19 @@
 }
 
 #bottombuttonsectioncontainer .buttonsection.sectionbeforevisible:after {
-    content: "◀︎";
+    /* content: "◀︎"; */
     content: url([[pix:format_buttons|OCP_beforeArrow]]);
   /*  background: #1177d1; */
     color: #1177d1;
     border-color: #1177d1;
-    border-radius: 100%;
+    border-radius: 0%;
+    width: 28px;
+    height: 28px;
 
+    position:relative; /*or absolute*/
+      z-index:100000; /*a number that's more than the modal box*/
+      left: -2px;
+      top: 4px;
 }
 #bottombuttonsectioncontainer .buttonsection.sectionaftervisible {
     /* content: url([[pix:format_buttons|OCP_nextArrow]]); */
