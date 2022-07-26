@@ -196,7 +196,21 @@
     color: #1177d1;
     color: #fff;
     border-color: #1177d1;
-    border-radius: 100%;
+    border-radius: 0%;
+}
+
+#bottombuttonsectioncontainer .buttonsection.sectionaftervisible {
+    /* content: url([[pix:format_buttons|OCP_nextArrow]]); */
+    color: #1177d1;
+    color: #fff;
+    border-color: #1177d1;
+    border-radius: 0%;
+      /* width: 0;
+      height: 0;
+      border-top: 10px solid transparent;
+      border-bottom: 10px solid transparent;
+      border-left: 10px solid #1177d1; */
+
 }
 
 #bottombuttonsectioncontainer .buttonsection.sectionbeforevisible:after {
@@ -208,31 +222,29 @@
     border-radius: 0%;
     width: 28px;
     height: 28px;
-
     position:relative; /*or absolute*/
-      z-index:100000; /*a number that's more than the modal box*/
-      left: -2px;
-      top: 4px;
-}
-#bottombuttonsectioncontainer .buttonsection.sectionaftervisible {
-    /* content: url([[pix:format_buttons|OCP_nextArrow]]); */
-    color: #1177d1;
-    color: #fff;
-    border-color: #1177d1;
-    border-radius: 100%;
+    z-index:100000; /*a number that's more than the modal box*/
+    left: -2px;
+    top: 4px;
 }
 
 #bottombuttonsectioncontainer .divisorline:before {
   /* content: url([[pix:format_buttons|OCP_nextBar]])); */
 }
 #bottombuttonsectioncontainer .buttonsection.sectionaftervisible:before {
-    content: "▶︎";
+    /* content: "▶︎"; */
     /* content: url([[pix:format_buttons|OCP_nextArrow]]); */
-
-    /*  background: #1177d1; */
+    content: url([[pix:format_buttons|OCP_nextArrow]]);
+  /*  background: #1177d1; */
     color: #1177d1;
     border-color: #1177d1;
-    border-radius: 100%;
+    border-radius: 0%;
+    width: 28px;
+    height: 28px;
+    position:relative; /*or absolute*/
+    z-index:100000; /*a number that's more than the modal box*/
+    left: -2px;
+    top: 4px;
 
 }
 
