@@ -346,6 +346,12 @@ class format_buttons_renderer extends format_topics_renderer
             //   $arspan = html_writer::tag('div', "", ['id' => '', 'class' => 'divisorline']);
             //    $name = $arspan.''.$name;
             // }
+            if($count == 1) {
+              $class .= ' specialbg';
+            }
+            if ($count == $course->{'divisor' . $currentdivisor}) {
+              $class .= ' specialbg2';              
+            }
 
             $html .= html_writer::tag('div', $name, ['id' => $id, 'class' => $class, 'onclick' => $onclick]);
             $count++;
