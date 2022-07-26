@@ -100,6 +100,9 @@
 #buttonsectioncontainer.circle .buttonsection {
     border-radius: 100%;
 }
+#bottombuttonsectioncontainer.circle .buttonsection {
+    border-radius: 100%;
+}
 
 #buttonsectioncontainer .buttonsection:hover {
     background: #bac1c5;
@@ -194,7 +197,6 @@
     background: var(--button-col);
     color: #fff;
     border-color: var(--button-col);
-    border-radius: 100%;
 
 }
 #bottombuttonsectioncontainer .buttonsection.sectionnotvisible {
@@ -227,7 +229,7 @@
     margin: var(--half-diff) 15px;
     width: calc(var(--arrow-height) * 1.3 );
     height: var(--arrow-height);
-
+    border-radius: 0%;
 }
 
 #bottombuttonsectioncontainer .buttonsection.sectionbeforevisible {
