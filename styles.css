@@ -85,27 +85,6 @@
     margin: 0 5px 10px 5px;
     vertical-align: top;
 }
-#bottombuttonsectioncontainer .buttonsection {
-  /*  background: #dee3e8; */
-    color: #7a8188;
-    display: inline-block;
-    text-align: center;
-    width: 28px;
-    line-height: 28px;
-    height: 28px;
-    overflow: hidden;
-    cursor: pointer;
-    font-size: 15px;
-    padding: 0;
-    font-weight: 500;
-    margin: 0 5px 10px 5px;
-    vertical-align: top;
-    border-radius: 100%;
-    color: #1177d1;
-/*    border-color: #1177d1;
-    background: #1177d1;*/
-
-}
 
 
 #buttonsectioncontainer.circle .buttonsection {
@@ -148,6 +127,98 @@
     text-align: right;
     color: rgba(0, 0, 0, 0.6);
 }
+
+/* colors */
+#buttonsectioncontainer .buttonsection.current {
+    background: #115898;
+    color: #fff;
+}
+
+#buttonsectioncontainer .buttonsection.sectionvisible {
+    background: #1177d1;
+    color: #fff;
+    border-color: #1177d1;
+}
+
+
+
+
+
+
+#bottombuttonsectioncontainer {
+  --ent-height: 30px;
+  --arrow-height: 20px;
+  --half-diff: calc((var(--ent-height) - var(--arrow-height))/ 2);
+  /*
+  var(--ent-height)
+  var(--arrow-height)
+  var(--half-diff)
+  */
+}
+
+#bottombuttonsectioncontainer .buttonsection {
+  /*  background: #dee3e8; */
+    color: #7a8188;
+    display: inline-block;
+    text-align: center;
+    width: var(--ent-height);
+    line-height: var(--ent-height);
+    height: var(--ent-height);
+    overflow: hidden;
+    cursor: pointer;
+    font-size: 15px;
+    padding: 0;
+    font-weight: 500;
+    /* margin: 0 15px 10px 15px; */
+    vertical-align: top;
+    color: #1177d1;
+/*    border-color: #1177d1;
+    background: #1177d1;*/
+
+}
+
+
+
+
+#bottombuttonsectioncontainer .buttonsection.sectionvisible {
+    background: #1177d1;
+    color: #fff;
+    border-color: #1177d1;
+    border-radius: 100%;
+
+}
+#bottombuttonsectioncontainer .buttonsection.sectionnotvisible {
+  /* display: none; */
+  display: none;
+}
+
+#bottombuttonsectioncontainer .buttonsection.sectionbeforevisible,
+#bottombuttonsectioncontainer .buttonsection.sectionaftervisible {
+  /* content: url([[pix:format_buttons|OCP_beforeArrow]]); */
+  /*  background: #1177d1; */
+    color: #1177d1;
+    color: #fff;
+    border-color: #1177d1;
+    margin: var(--half-diff) 15px;
+    width: 0;
+    height: 0;
+
+}
+
+#bottombuttonsectioncontainer .buttonsection.sectionbeforevisible {
+     border-top: calc(var(--arrow-height) / 2 ) solid transparent;
+     border-bottom:  calc(var(--arrow-height) / 2 ) solid transparent;
+     border-right: var(--arrow-height) solid #1177d1;
+}
+
+#bottombuttonsectioncontainer .buttonsection.sectionaftervisible {
+      border-top: calc(var(--arrow-height) / 2 ) solid transparent;
+      border-bottom: calc(var(--arrow-height) / 2 ) solid transparent;
+      border-left: var(--arrow-height) solid #1177d1;
+
+}
+
+
 #bottombuttonsectioncontainer .divisorsection {
     display: inline-block;
     padding: 0;
@@ -169,83 +240,8 @@
     color: rgba(0, 0, 0, 0.6);
 }
 
-/* colors */
-#buttonsectioncontainer .buttonsection.current {
-    background: #115898;
-    color: #fff;
-}
-
-#buttonsectioncontainer .buttonsection.sectionvisible {
-    background: #1177d1;
-    color: #fff;
-    border-color: #1177d1;
-}
-#bottombuttonsectioncontainer .buttonsection.sectionvisible {
-    background: #1177d1;
-    color: #fff;
-    border-color: #1177d1;
-}
-#bottombuttonsectioncontainer .buttonsection.sectionnotvisible {
-  /* display: none; */
-  display: none;
-}
-
-#bottombuttonsectioncontainer .buttonsection.sectionbeforevisible {
-  /* content: url([[pix:format_buttons|OCP_beforeArrow]]); */
-  /*  background: #1177d1; */
-    color: #1177d1;
-    color: #fff;
-    border-color: #1177d1;
-    border-radius: 0%;
-}
-
-#bottombuttonsectioncontainer .buttonsection.sectionaftervisible {
-    /* content: url([[pix:format_buttons|OCP_nextArrow]]); */
-    color: #1177d1;
-    color: #fff;
-    border-color: #1177d1;
-    border-radius: 0%;
-      /* width: 0;
-      height: 0;
-      border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent;
-      border-left: 10px solid #1177d1; */
-
-}
-
-#bottombuttonsectioncontainer .buttonsection.sectionbeforevisible:after {
-    /* content: "◀︎"; */
-    content: url([[pix:format_buttons|OCP_beforeArrow]]);
-  /*  background: #1177d1; */
-    color: #1177d1;
-    border-color: #1177d1;
-    border-radius: 0%;
-    width: 28px;
-    height: 28px;
-    position:relative; /*or absolute*/
-    z-index:100000; /*a number that's more than the modal box*/
-    left: -2px;
-    top: 4px;
-}
-
 #bottombuttonsectioncontainer .divisorline:before {
   /* content: url([[pix:format_buttons|OCP_nextBar]])); */
-}
-#bottombuttonsectioncontainer .buttonsection.sectionaftervisible:before {
-    /* content: "▶︎"; */
-    /* content: url([[pix:format_buttons|OCP_nextArrow]]); */
-    content: url([[pix:format_buttons|OCP_nextArrow]]);
-  /*  background: #1177d1; */
-    color: #1177d1;
-    border-color: #1177d1;
-    border-radius: 0%;
-    width: 28px;
-    height: 28px;
-    position:relative; /*or absolute*/
-    z-index:100000; /*a number that's more than the modal box*/
-    left: -2px;
-    top: 4px;
-
 }
 
 #buttonsectioncontainer .divisorsection.inlinebuttonsections {
