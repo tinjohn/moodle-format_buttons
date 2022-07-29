@@ -18,9 +18,12 @@
  * format_buttons_renderer
  *
  * @package    format_buttons
- * @author     Rodrigo Brandão <https://www.linkedin.com/in/brandaorodrigo>
- * @copyright  2020 Rodrigo Brandão <rodrigo.brandao.contato@gmail.com>
+ * @author     Tina John
+ * @author     based on the work of Rodrigo Brandão <https://www.linkedin.com/in/brandaorodrigo>
+ * @copyright  2022 Tina John <johnt.22.tijo@gmail.com>
+ * @copyright  based on the work GNU GPL2020 Rodrigo Brandão <rodrigo.brandao.contato@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ *
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -228,9 +231,10 @@ class format_buttons_renderer extends format_topics_renderer
     }
 
 
-
+    // INCLUDED /course/format/renderer.php function get_button_section_bottom
+    // based on get_button_section
     /**
-     * Get_button_section
+     * Get_button_section_bottom
      *
      * @param stdclass $course
      * @param string $sectionvisible
@@ -242,17 +246,16 @@ class format_buttons_renderer extends format_topics_renderer
         $css = '';
         if ($colorcurrent = $this->get_color_config($course, 'colorcurrent')) {
             $css .=
-            '#bottombuttonsectioncontainer .buttonsection.current {
-                background: ' . $colorcurrent . ';
-            }
-            ';
+            '#bottombuttonsectioncontainer {
+                --button-currcol: ' . $colorcurrent . ';
+            }';
         }
         if ($colorvisible = $this->get_color_config($course, 'colorvisible')) {
             $css .=
-            '#bottombuttonsectioncontainer .buttonsection.sectionvisible {
-                background: ' . $colorvisible . ';
-            }
-            ';
+            '#bottombuttonsectioncontainer {
+                --button-viscol: ' . $colorvisible . ';
+            }';
+;
         }
         if ($css) {
             $html .= html_writer::tag('style', $css);
@@ -270,7 +273,7 @@ class format_buttons_renderer extends format_topics_renderer
         $count = 1;
         $currentdivisor = 1;
         $modinfo = get_fast_modinfo($course);
-        $inline = 'TINAAAA - Bottombuttons';
+        $inline = '';
         foreach ($modinfo->get_section_info_all() as $section => $thissection) {
             if ($section == 0) {
                 continue;
@@ -286,20 +289,7 @@ class format_buttons_renderer extends format_topics_renderer
                 $currentdivisor++;
                 $count = 1;
             }
-            if (isset($course->{'divisor' . $currentdivisor}) &&
-                $course->{'divisor' . $currentdivisor} != 0 &&
-                !isset($divisorshow[$currentdivisor])) {
-                $currentdivisorhtml = format_string($course->{'divisortext' . $currentdivisor});
-                $currentdivisorhtml = str_replace('[br]', '<br>', $currentdivisorhtml);
-                $currentdivisorstring = $currentdivisorhtml;
 
-                $currentdivisorhtml = html_writer::tag('div', $currentdivisorhtml, ['class' => 'divisortext']);
-                if ($course->inlinesections) {
-                    $inline = 'inlinebuttonsections';
-                }
-                //$html .= html_writer::tag('div', $currentdivisorhtml, ['class' => "divisorsection $inline"]);
-                $divisorshow[$currentdivisor] = true;
-            }
             $id = 'bottombuttonsection-' . $section;
             if ($course->sequential) {
                 $name = $section;
@@ -326,9 +316,6 @@ class format_buttons_renderer extends format_topics_renderer
                 $class .= ' sectionhidden';
                 $onclick = false;
             }
-            if ($course->marker == $section) {
-                $class .= ' current';
-            }
 
             if ($sectionvisible == $section) {
                 $class .= ' sectionvisible';
@@ -347,10 +334,14 @@ class format_buttons_renderer extends format_topics_renderer
             //    $name = $arspan.''.$name;
             // }
             if($count == 1) {
-              $class .= ' specialbg';
+              $class .= ' specialbgafter';
             }
             if ($count == $course->{'divisor' . $currentdivisor}) {
-              $class .= ' specialbg2';              
+              $class .= ' specialbgbefore';
+            }
+
+            if ($course->marker == $section) {
+                $class .= ' current';
             }
 
             $html .= html_writer::tag('div', $name, ['id' => $id, 'class' => $class, 'onclick' => $onclick]);
@@ -362,6 +353,8 @@ class format_buttons_renderer extends format_topics_renderer
         }
         return $html;
     }
+
+    // END INCLUDED
 
     /**
      * Start_section_list
@@ -553,8 +546,14 @@ class format_buttons_renderer extends format_topics_renderer
         } else {
             echo $this->end_section_list();
         }
-        // tinjohn 2022-07-21
-        echo $this->get_button_section_bottom($course, $sectionvisible);
+
+        // ADDED.
+        // tinjohn 2022-07-29
+        // configuration option was added and is used here
+        if ($course->usebottommenu) {
+          echo $this->get_button_section_bottom($course, $sectionvisible);
+        }
+        // END ADDED.
 
         if (!$PAGE->user_is_editing()) {
             $PAGE->requires->js_init_call('M.format_buttons.init', [$course->numsections, $sectionvisible, $course->id]);

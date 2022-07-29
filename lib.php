@@ -70,9 +70,13 @@ class format_buttons extends format_topics {
                 'default' => get_config('format_buttons', 'sectionposition'),
                 'type' => PARAM_INT,
             );
-
             $courseformatoptions['inlinesections'] = array(
                 'default' => get_config('format_buttons', 'inlinesections'),
+                'type' => PARAM_INT,
+            );
+
+            $courseformatoptions['usebottommenu'] = array(
+                'default' => get_config('format_buttons', 'usebottommenu'),
                 'type' => PARAM_INT,
             );
 
@@ -181,6 +185,21 @@ class format_buttons extends format_topics {
                     array(
                         0 => get_string('above', 'format_buttons'),
                         1 => get_string('below', 'format_buttons'),
+                    ),
+                ),
+            );
+
+            // tinjohn 2022-07-29
+            // option for bottom menu - defaults no
+            $courseformatoptionsedit['usebottommenu'] = array(
+                'label' => get_string('usebottommenu', 'format_buttons'),
+                'help' => 'usebottommenu',
+                'help_component' => 'format_buttons',
+                'element_type' => 'select',
+                'element_attributes' => array(
+                    array(
+                        0 => get_string('no', 'format_buttons'),
+                        1 => get_string('yes', 'format_buttons'),
                     ),
                 ),
             );
