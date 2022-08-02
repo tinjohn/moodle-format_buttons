@@ -17,8 +17,10 @@
  * format_buttons_renderer
  *
  * @package    format_buttons
- * @author     Rodrigo Brandão <https://www.linkedin.com/in/brandaorodrigo>
- * @copyright  2020 Rodrigo Brandão <rodrigo.brandao.contato@gmail.com>
+ * @author     Tina John
+ * @author     based on the work of Rodrigo Brandão <https://www.linkedin.com/in/brandaorodrigo>
+ * @copyright  2022 Tina John <johnt.22.tijo@gmail.com>
+ * @copyright  based on the work 2020 Rodrigo Brandão <rodrigo.brandao.contato@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -81,31 +83,43 @@ M.format_buttons.show = function(id, courseid) {
     id = parseInt(id);
     if (id > 0) {
         var buttonsection = document.getElementById('buttonsection-' + id);
-        var bottombuttonsection = document.getElementById('bottombuttonsection-' + id);
+        var bottombuttonsection = document.getElementById('bottombuttonsection-' + id); // ADDED
         var currentsection = document.getElementById('section-' + id);
         if (buttonsection && currentsection) {
             buttonsection.setAttribute('class', buttonsection.getAttribute('class') + ' sectionvisible');
-            bottombuttonsection.setAttribute('class', bottombuttonsection.getAttribute('class').replace('sectionnotvisible', 'sectionvisible'));
+            bottombuttonsection.setAttribute('class', bottombuttonsection.getAttribute('class').replace('sectionnotvisible', 'sectionvisible')); // ADDED
             currentsection.style.display = 'block';
             document.cookie = 'sectionvisible_' + courseid + '=' + id + '; path=/';
             M.format_buttons.h5p();
 
         }
 
+        // ADDED
+        // set classes for adjacent (previous / next) visible sections
         if (id > 1) {
           var beforeid = id - 1;
           var bottombuttonsectionbefore = document.getElementById('bottombuttonsection-' + beforeid );
-          if(bottombuttonsectionbefore) {
-            bottombuttonsectionbefore.setAttribute('class', bottombuttonsectionbefore.getAttribute('class').replace('sectionnotvisible', 'sectionbeforevisible'));
+          if (!bottombuttonsectionbefore && beforeid > 0) {
+            while(!bottombuttonsectionbefore) {
+              beforeid = beforeid - 1;
+              bottombuttonsectionbefore = document.getElementById('bottombuttonsection-' + beforeid );
+            }
           }
+          bottombuttonsectionbefore.setAttribute('class', bottombuttonsectionbefore.getAttribute('class').replace('sectionnotvisible', 'sectionbeforevisible'));
         }
         if (id < this.numsections) {
           var afterid = id + 1;
           var bottombuttonsectionnext = document.getElementById('bottombuttonsection-' + afterid );
-          if(bottombuttonsectionnext) {
-            bottombuttonsectionnext.setAttribute('class', bottombuttonsectionnext.getAttribute('class').replace('sectionnotvisible', 'sectionaftervisible'));
+          if(!bottombuttonsectionnext) {
+            while(!bottombuttonsectionnext && afterid <= this.numsections) {
+              afterid = afterid + 1;
+              bottombuttonsectionnext = document.getElementById('bottombuttonsection-' + afterid );
+            }
           }
+          bottombuttonsectionnext.setAttribute('class', bottombuttonsectionnext.getAttribute('class').replace('sectionnotvisible', 'sectionaftervisible'));
         }
+
+        // ADDED END
     }
 };
 

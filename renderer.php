@@ -156,7 +156,7 @@ class format_buttons_renderer extends format_topics_renderer
         $count = 1;
         $currentdivisor = 1;
         $modinfo = get_fast_modinfo($course);
-        $inline = 'TINAAAA - taucht im HTML auf aber wird nicht angezeigt Ids identisch??';
+        $inline = '';
         foreach ($modinfo->get_section_info_all() as $section => $thissection) {
             if ($section == 0) {
                 continue;
@@ -231,6 +231,56 @@ class format_buttons_renderer extends format_topics_renderer
     }
 
 
+    // INCLUDED
+    /**
+     * is_previous_vis_section
+     *
+     * @return boolean
+     */
+     protected function is_previous_vis_section ($course, $sectionnrvisible, $sectionnr) {
+       $modinfo = get_fast_modinfo($course);
+
+       # sectionsnrvisible - preselected section
+       # sectionnr - current section in processing
+
+
+       # it's a previous section when
+       # $sectionvisible - 1 == $section && (int)$thissection->visible
+       $sectionnrbef = $sectionnrvisible - 1;
+       $thissection = $modinfo->get_section_info($sectionnrbef);
+
+
+       if($sectionnrbef == $sectionnr && $thissection->visible) {
+         return true;
+       } else {
+         # find previous visible section and check against section
+         while (!$thissection->visible) {
+           $sectionnrbef = $sectionnrbef - 1;
+           if($sectionnrbef == 1) {
+             return false;
+           }
+           $thissection = $modinfo->get_section_info($sectionnrbef);
+         }
+         if($sectionnrbef == $sectionnr) {
+           return true;
+         }
+       }
+       return false;
+     }
+
+     /**
+      * is_next_vis_section
+      *
+      * @return boolean
+      */
+      protected function is_next_vis_section ($course, $sectionvisible, $section) {
+        if($sectionvisible + 1  == $section) {
+          return true;
+        }
+        return false;
+      }
+
+
     // INCLUDED /course/format/renderer.php function get_button_section_bottom
     // based on get_button_section
     /**
@@ -274,7 +324,13 @@ class format_buttons_renderer extends format_topics_renderer
         $currentdivisor = 1;
         $modinfo = get_fast_modinfo($course);
         $inline = '';
+        $lasthidden = false;
+        $hidden = false;
         foreach ($modinfo->get_section_info_all() as $section => $thissection) {
+            if($hidden) {
+              $lasthidden = true;
+            }
+            $hidden = false;
             if ($section == 0) {
                 continue;
             }
@@ -312,20 +368,35 @@ class format_buttons_renderer extends format_topics_renderer
             if (!$thissection->available &&
                 !empty($thissection->availableinfo)) {
                 $class .= ' sectionhidden';
+                $hidden = true;
             } else if (!$thissection->uservisible || !$thissection->visible) {
                 $class .= ' sectionhidden';
                 $onclick = false;
+                $hidden = true;
             }
+
+
+                        // if ($sectionvisible == $section) {
+                        //     $class .= ' sectionvisible';
+                        // } elseif ($sectionvisible - 1 == $section) {
+                        //     $class .= ' sectionbeforevisible';
+                        // } elseif ($sectionvisible + 1  == $section) {
+                        //     $class .= ' sectionaftervisible';
+                        // } else {
+                        //   $class .= ' sectionnotvisible';
+                        // }
 
             if ($sectionvisible == $section) {
                 $class .= ' sectionvisible';
-            } elseif ($sectionvisible - 1 == $section) {
+            } elseif ($this->is_previous_vis_section($course, $sectionvisible, $section)) {
                 $class .= ' sectionbeforevisible';
-            } elseif ($sectionvisible + 1  == $section) {
+            } elseif ($this->is_next_vis_section($course, $sectionvisible, $section)) {
                 $class .= ' sectionaftervisible';
             } else {
               $class .= ' sectionnotvisible';
             }
+
+
             if ($PAGE->user_is_editing()) {
                 $onclick = false;
             }
@@ -343,8 +414,9 @@ class format_buttons_renderer extends format_topics_renderer
             if ($course->marker == $section) {
                 $class .= ' current';
             }
-
-            $html .= html_writer::tag('div', $name, ['id' => $id, 'class' => $class, 'onclick' => $onclick]);
+            if (!$hidden) {
+              $html .= html_writer::tag('div', $name, ['id' => $id, 'class' => $class, 'onclick' => $onclick]);
+            }
             $count++;
         }
         $html = html_writer::tag('div', $html, ['id' => 'bottombuttonsectioncontainer', 'class' => $course->buttonstyle]);
@@ -353,6 +425,7 @@ class format_buttons_renderer extends format_topics_renderer
         }
         return $html;
     }
+
 
     // END INCLUDED
 
