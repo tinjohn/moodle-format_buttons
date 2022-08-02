@@ -17,16 +17,18 @@
 /**
  * format_buttons_renderer
  *
- * @package    format_buttons
- * @author     Rodrigo Brandão <https://www.linkedin.com/in/brandaorodrigo>
- * @copyright  2020 Rodrigo Brandão <rodrigo.brandao.contato@gmail.com>
+ * @package    format_buttons_x
+ * @author     Tina John
+ * @author     based on the work of Rodrigo Brandão <https://www.linkedin.com/in/brandaorodrigo>
+ * @copyright  2022 Tina John <johnt.22.tijo@gmail.com>
+ * @copyright  based on the work 2020 Rodrigo Brandão <rodrigo.brandao.contato@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->requires = 2015111600; /* moodle 3.0 */
-$plugin->component = 'format_buttons';
+$plugin->component = 'format_buttons_x';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '3.x';
-$plugin->version = 2020072801;
+$plugin->release = '1.x';
+$plugin->version = 2022080101;
