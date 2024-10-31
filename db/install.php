@@ -15,17 +15,20 @@
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Code to be executed after the plugin's database scheme has been installed is defined here.
  *
  * @package     format_buttons
+ * @category    upgrade
  * @copyright   2023 Jhon Rangel <jrangelardila@gmail.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'format_buttons';
-$plugin->release = '1.8';
-$plugin->version = 2024101100;
-$plugin->requires = 2023042400;
-$plugin->maturity = MATURITY_STABLE;
+/**
+ * Custom code to be run on installing the plugin.
+ */
+function xmldb_format_buttons_install() {
+
+    return true;
+}

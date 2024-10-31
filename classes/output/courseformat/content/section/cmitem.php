@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - https://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -12,20 +12,29 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Plugin version and other meta-data are defined here.
+ * Code to be executed after the plugin's database scheme has been installed is defined here.
  *
  * @package     format_buttons
+ * @category    upgrade
  * @copyright   2023 Jhon Rangel <jrangelardila@gmail.com>
  * @license     https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+namespace format_buttons\classes\output\courseformat\content\section;
 
-$plugin->component = 'format_buttons';
-$plugin->release = '1.8';
-$plugin->version = 2024101100;
-$plugin->requires = 2023042400;
-$plugin->maturity = MATURITY_STABLE;
+use core_courseformat\output\local\content\section\cmitem as cmitem_base;
+
+class cmitem extends cmitem_base {
+
+    /**
+     * Returns the output class template path.
+     *
+     * This method redirects the default template when the section activity item is rendered.
+     */
+    public function get_template_name(\renderer_base $renderer): string {
+        return 'format_buttons/local/content/section/cmitem';
+    }
+}
