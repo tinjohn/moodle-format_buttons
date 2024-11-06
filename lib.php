@@ -279,7 +279,7 @@ function format_buttons_inplace_editable($itemtype, $itemid, $newvalue)
     if ($itemtype === 'sectionname' || $itemtype === 'sectionnamenl') {
         $section = $DB->get_record_sql(
             'SELECT s.* FROM {course_sections} s JOIN {course} c ON s.course = c.id WHERE s.id = ? AND c.format = ?',
-            [$itemid, 'pluginname'],
+            [$itemid, 'buttons'],
             MUST_EXIST
         );
         $format = core_courseformat\base::instance($section->course);
