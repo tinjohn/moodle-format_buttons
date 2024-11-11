@@ -220,6 +220,20 @@ class format_buttons extends core_courseformat\base
             )
         );
 
+        $courseformatoptionsedit['section_zero_ubication'] = array(
+            'label' => get_string('section_zero_ubication', 'format_buttons'),
+            'help' => 'section_zero_ubication',
+            'help_component' => 'format_buttons',
+            'element_type' => 'select',
+            'default' => '0',
+            'element_attributes' => array(
+                array(
+                    '0' => get_string('no'),
+                    '1' => get_string('yes'),
+                )
+            )
+        );
+
 
         return $courseformatoptionsedit;
     }

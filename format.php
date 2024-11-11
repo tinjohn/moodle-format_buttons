@@ -41,7 +41,7 @@ $renderer = $format->get_renderer($PAGE);
 
 // Setup the format base instance.
 if (!empty($displaysection)) {
-    $format->set_section_number($displaysection);
+    $format->set_sectionnum($displaysection);
 }
 // Output course content.
 $outputclass = $format->get_output_classname('content');

@@ -52,7 +52,7 @@ class section extends section_base
 
     public function export_for_template(renderer_base $output): stdClass
     {
-        global $USER, $PAGE;
+        global $PAGE;
 
         $format = $this->format;
         $course = $format->get_course();
@@ -61,10 +61,6 @@ class section extends section_base
         $summary = new $this->summaryclass($format, $section);
         $section_numer = $section->section ?? '0';
         $title_section_view = $course->title_section_view;
-
-        if ($title_section_view == 1) {
-            $title_section_view = $section_numer == 0 ? 0 : $course->title_section_view;
-        }
 
         $data = (object)[
             'num' => $section_numer,

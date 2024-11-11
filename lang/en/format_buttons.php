@@ -66,3 +66,6 @@ $string['selectformbtn'] = 'Indicate the shape of the buttons';
 $string['selectform_help'] = 'Select the shape in which the buttons are displayed';
 $string['title_section_view'] = 'Show the title of each section';
 $string['title_section_view_help'] = 'Indicate if it is necessary to show the title of each section';
+$string['plugin_description'] = 'Buttons is a course format that creates a menu with buttons to access the sections, one by one.';
+$string['section_zero_ubication'] = 'Show section 0 as a button';
+$string['section_zero_ubication_help'] = 'Indicate if you want section 0 to be displayed as a button. Otherwise, it will remain at the top';

@@ -66,3 +66,6 @@ $string['selectformbtn'] = 'Indique la forma de los botones';
 $string['selectform_help'] = 'Seleccionar la forma en que se muestran los botones';
 $string['title_section_view'] = 'Mostrar el titulo de cada sección';
 $string['title_section_view_help'] = 'Indique si se considera necesario mostrar el titulo de cada sección';
+$string['plugin_description'] = 'Buttons es un formato de curso que crea un menú con botones para acceder a las secciones, una por una.';
+$string['section_zero_ubication'] = 'Mostrar la sección 0 como boton';
+$string['section_zero_ubication_help'] = 'Indicar si desea que la sección 0 se muestre como boton. De lo contrario quedara en la parte superior';

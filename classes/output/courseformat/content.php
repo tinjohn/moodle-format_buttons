@@ -29,7 +29,9 @@ use cache;
 use context_system;
 use core_courseformat\output\local\content as content_base;
 use course_modinfo;
+use Matrix\Exception;
 use moodle_url;
+use TypeError;
 
 class content extends content_base
 {
@@ -67,7 +69,10 @@ class content extends content_base
         $section_prev = self::get_last_section_access($course->id);
         foreach ($all_sections as $section) {
             $info = new \stdClass();
-            if ($section->section != 0) {
+            if ($section->section != 0 && !$course->section_zero_ubication) {
+                $info->body = true;
+            }
+            if ($course->section_zero_ubication) {
                 $info->body = true;
             }
             $url = new moodle_url("/course/view.php", array(
@@ -86,28 +91,29 @@ class content extends content_base
             ['expandsection' => null,
                 'section' => null,
             ]);
-        if ($section_select['expandsection'] != "" & $section_select['expandsection'] != "0") {
-            if (isset($array_sections[$section_select['expandsection']])) {
-                $array_sections[$section_select['expandsection']]->selected = true;
-                self::save_last_section_access($course->id, $section_select['expandsection']);
-            }
-        } else {
-            if ($section_prev && isset($array_sections[$section_prev])) {
-                $array_sections[$section_prev]->selected = true;
-            }
-        }
 
-        if (sizeof($all_sections) - 1 < ($section_select['expandsection'])) {
-            $url = new moodle_url("/course/view.php", array('id' => $course->id));
+        if (sizeof($all_sections) - 1 < ($section_select)) {
+            $url = new moodle_url("/course/view.php", array('id' => $course->id, 'expandsection' => 0));
             self::save_last_section_access($course->id, null);
             redirect($url);
         }
 
-        if ($section_select['section'] != "" && $section_select['section'] != "0") {
-            if ($section_prev && isset($array_sections[$section_prev])) {
-                $array_sections[$section_select['section']]->selected = true;
+        if (sizeof($all_sections) - 1 < ($section_prev)) {
+            $url = new moodle_url("/course/view.php", array('id' => $course->id, 'expandsection' => 0));
+            self::save_last_section_access($course->id, null);
+            redirect($url);
+        }
+
+        if ($section_select != "") {
+            if ($section_select == "0" && !$course->section_zero_ubication) {
+                if (isset($array_sections[1])) {
+                    $array_sections[1]->selected = true;
+                    self::save_last_section_access($course->id, 1);
+                }
+            } else {
+                $array_sections[$section_select]->selected = true;
+                self::save_last_section_access($course->id, $section_select);
             }
-            self::save_last_section_access($course->id, $section_select['section']);
         } else {
             $section = self::get_last_section_access($course->id);
             if ($section && isset($array_sections[$section])) {
@@ -116,7 +122,9 @@ class content extends content_base
         }
 
         $sections = $this->export_sections($output);
-        $sections[0]->section = 1;
+        if (!$course->section_zero_ubication) {
+            $sections[0]->section = 1;
+        }
 
         switch ($course->selectoption) {
             case "number";
@@ -168,14 +176,22 @@ class content extends content_base
             $data->bulkedittools = $bulkedittools->export_for_template($output);
         }
 
-
         $sectionnavigation = new $this->sectionnavigationclass($format, $this->currentsection);
 
         $data->sectionnavigation = $sectionnavigation->export_for_template($output);
 
         $sectionselector = new $this->sectionselectorclass($format, $sectionnavigation);
-        $data->sectionselector = $sectionselector->export_for_template($output);
+        try {
+            $data->sectionselector = $sectionselector->export_for_template($output);
+        } catch (TypeError $e) {
+            $this->currentsection = 0;
+            $sectionnavigation = new $this->sectionnavigationclass($format, $this->currentsection);
 
+            $data->sectionnavigation = $sectionnavigation->export_for_template($output);
+
+            $sectionselector = new $this->sectionselectorclass($format, $sectionnavigation);
+            $data->sectionselector = $sectionselector->export_for_template($output);
+        }
 
         $url = new moodle_url("/course/changenumsections.php",
             array('courseid' => $course->id, 'insertsection' => 0, 'sesskey' => sesskey()));
@@ -221,22 +237,16 @@ class content extends content_base
                 'section' => null,
             ));
 
-        foreach ($section_select as $section) {
-            if ($section != "" && $section != "0") {
-                $section_select['expandsection'] = $section;
-            }
-        }
-
-        if (!$section_select['expandsection']) {
+        if (!$section_select) {
             $last = self::get_last_section_access($course->id);
             if ($last) {
                 $this->currentsection = $last;
-                $section_select['expandsection'] = $last;
+                $section_select = $last;
             } else {
-                $this->currentsection = 1;
+                $this->currentsection = $course->section_zero_ubication ? 0 : 1;
             }
         } else {
-            $this->currentsection = $section_select['expandsection'];
+            $this->currentsection = $section_select;
         }
 
         foreach ($this->get_sections_to_display($modinfo) as $thissection) {
@@ -249,17 +259,24 @@ class content extends content_base
             $section = new $this->sectionclass($format, $thissection);
             $sectionnum = $section->get_section_number();
 
-            if (!$section_select['expandsection']) {
-                if ($sectionnum > 1) {
+            if ($course->section_zero_ubication) {
+                if ($this->currentsection != $sectionnum) {
                     continue;
                 }
+
             } else {
-                if ($sectionnum != 0 and $sectionnum != $section_select['expandsection']) {
+                if (!$this->currentsection) {
+                    if ($sectionnum > 1) {
+                        continue;
+                    }
+                } else {
+                    if ($sectionnum != 0 and $sectionnum != $section_select) {
+                        continue;
+                    }
+                }
+                if ($sectionnum === 0 && $firstsectionastab) {
                     continue;
                 }
-            }
-            if ($sectionnum === 0 && $firstsectionastab) {
-                continue;
             }
 
             if ($sectionnum > $numsections) {
@@ -289,28 +306,30 @@ class content extends content_base
      * Retornar los parametros de la url
      *
      * @param $params_need
-     * @return mixed
+     * @return mixed|string
      * @throws \coding_exception
-     * @throws \moodle_exception
+     * @throws \core\exception\coding_exception
+     * @throws \core\exception\moodle_exception
+     * @throws \dml_exception
      */
     static function get_param_for_url($params_need)
     {
-        global $FULLME;
+        global $PAGE, $DB;
 
-        $current_url = new moodle_url($FULLME);
-
-        $params = $current_url->params();
+        $section_select = null;
 
         foreach ($params_need as $param => $value) {
             $param_value = optional_param($param, null, PARAM_INT);
-            if ($param_value !== null) {
-                $params_need[$param] = $param_value;
-            } else {
-                $value = isset($params[$param]) ? $params[$param] : '';
-                $params_need[$param] = $value;
+            if ($param_value != "") {
+                $section_select = $param_value;
+                break;
             }
         }
-        return $params_need;
+        $id = optional_param('id', null, PARAM_INT);
+        if ($PAGE->url->out_as_local_url(false) === '/course/section.php?id=' . $id) {
+            $section_select = $DB->get_record('course_sections', ['id' => $id], '*', MUST_EXIST)->section;
+        }
+        return $section_select;
     }
 
     /**
@@ -369,9 +388,11 @@ class content extends content_base
     private function leter_lowercase(array $array_sections)
     {
         $count = 0;
-
+        $format = $this->format;
+        $course = $format->get_course();
         foreach ($array_sections as $array_section) {
-            if (empty($array_section->namesection)) continue;
+
+            if (empty($array_section->namesection) && !$course->section_zero_ubication) continue;
 
             $array_section->namesection = $this->convert_lowercase_letter($count, 'a');
             $count++;
@@ -409,9 +430,10 @@ class content extends content_base
     private function leter_uppercase(array $array_sections)
     {
         $count = 0;
-
+        $format = $this->format;
+        $course = $format->get_course();
         foreach ($array_sections as $array_section) {
-            if (empty($array_section->namesection)) continue;
+            if (empty($array_section->namesection) && !$course->section_zero_ubication) continue;
 
             $array_section->namesection = $this->convert_uppercase_letter($count);
             $count++;
@@ -475,9 +497,11 @@ class content extends content_base
     {
         $options = $this->get_numbers_in_roman();
         $count = 1;
+        $format = $this->format;
+        $course = $format->get_course();
         foreach ($array_sections as $array_section) {
 
-            if ($array_section->namesection == 0) continue;
+            if (empty($array_section->namesection) && !$course->section_zero_ubication) continue;
 
             $array_section->namesection = $options[$count];
             $count++;
