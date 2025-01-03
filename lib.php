@@ -234,6 +234,38 @@ class format_buttons extends core_courseformat\base
             )
         );
 
+        $max_groups = get_config('format_buttons', 'max_groups');
+        if ($max_groups != 0) {
+            $max_sections = $this->get_max_sections();
+            $numbers = range(0, $max_sections);
+
+            for ($i = 0; $i < $max_groups; $i++) {
+                $courseformatoptionsedit['group_sections' . ($i + 1)] = array(
+                    'label' => get_string('sections_gruping', 'format_buttons', $i + 1),
+                    'help' => 'sections_gruping',
+                    'help_component' => 'format_buttons',
+                    'element_type' => 'select',
+                    'default' => '0',
+                    'element_attributes' => array(
+                        $numbers
+                    )
+                );
+
+                $courseformatoptionsedit['group_title' . ($i + 1)] = array(
+                    'label' => get_string('title_gruping', 'format_buttons', $i + 1),
+                    'help' => 'title_gruping',
+                    'help_component' => 'format_buttons',
+                    'element_type' => 'text',
+                );
+
+                $courseformatoptionsedit['group_colorfont' . ($i + 1)] = array(
+                    'label' => get_string('color_gruping', 'format_buttons', $i + 1),
+                    'help' => 'colorfont',
+                    'help_component' => 'format_buttons',
+                    'element_type' => 'text',
+                );
+            }
+        }
 
         return $courseformatoptionsedit;
     }

@@ -67,4 +67,23 @@ if ($ADMIN->fulltree) {
         itemid: 0,
         options: array('accepted_types' => '.png', 'maxfiles' => 1)
     ));
+
+    $strings = array(
+        'zero', 'one', 'two', 'three', 'four', 'five', 'six',
+        'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve',
+        'thirteen', 'fourteen', 'fifteen', 'sixteen'
+    );
+    $options = [];
+    $counter = 0;
+    foreach ($strings as $str) {
+        $options[$counter] = get_string($str, 'format_buttons');
+        $counter++;
+    }
+    $settings->add(new admin_setting_configselect(
+        'format_buttons/max_groups',
+        get_string('groups_course', 'format_buttons'),
+        get_string('groups_course_desc', 'format_buttons'),
+        4,
+        $options
+    ));
 }

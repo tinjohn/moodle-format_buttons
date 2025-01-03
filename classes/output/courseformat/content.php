@@ -31,6 +31,7 @@ use core_courseformat\output\local\content as content_base;
 use course_modinfo;
 use Matrix\Exception;
 use moodle_url;
+use stdClass;
 use TypeError;
 
 class content extends content_base
@@ -144,6 +145,8 @@ class content extends content_base
                 break;
         }
 
+        $array_sections = $this->agruping_sections($array_sections, $course);
+
         switch ($course->selectform) {
             case 'rounded':
                 $form_btn = "50%";
@@ -206,6 +209,106 @@ class content extends content_base
         }
 
         return $data;
+    }
+
+    /**
+     * Agrupar las secciones, de acuerdo a la configuración
+     *
+     * @param $array_sections
+     * @param $course
+     * @return mixed
+     * @throws \dml_exception
+     */
+    public function agruping_sections($array_sections, $course)
+    {
+        $max_groups = get_config('format_buttons', 'max_groups');
+
+        $atribute_sections = [];
+        if ($max_groups != 0) {
+            for ($i = 0; $i < $max_groups; $i++) {
+                $group_section = "group_sections" . ($i + 1);
+                if ($course->{$group_section} != 0) {
+                    $obj = new stdClass();
+                    $obj->count = $course->{$group_section};
+
+                    $title = "group_title" . ($i + 1);
+                    $obj->title = $course->{$title};
+
+                    $color = "group_colorfont" . ($i + 1);
+                    $obj->color = $course->{$color};
+
+                    $atribute_sections[$i + 1] = $obj;
+                }
+            }
+        }
+
+        $total_count_group = 0;
+        foreach ($atribute_sections as $atribute_section) {
+            $num_sections = $atribute_section->count;
+            $count = 0;
+            $zero = 0;
+            $count_first_btn_section = 0;
+            if ($num_sections != 0) {
+                foreach ($array_sections as $section) {
+                    $zero++;
+                    if ($zero == 1) continue;
+                    if ($count == $num_sections + $total_count_group) break;
+                    $count++;
+                    if ($total_count_group >= $count) continue;
+                    $count_first_btn_section++;
+                    //echo "total: " . $total_count_group . " count: " . $count . "<br>";
+                    $section->bgcolor = $atribute_section->color != "" ? $atribute_section->color : $section->bgcolor;
+                    $section->namesection = $num_sections == 1 ? "..." : $this->get_namesection_for_btn($count - $total_count_group, $course);
+                    if ($atribute_section->title != "" && $count_first_btn_section == 1) {
+                        $section->text_section = $atribute_section->title;
+                    }
+                }
+                $total_count_group += $num_sections;
+            }
+        }
+        return $array_sections;
+    }
+
+    /**
+     * Retornar el namesection, para  una sección, solo funciona al formar los grupos
+     * @param $count
+     * @param $course
+     * @return mixed|string
+     */
+    public function get_namesection_for_btn($count, $course)
+    {
+        switch ($course->selectoption) {
+            case "number";
+                //Si es number se deja por defecto
+                break;
+            case 'leter_lowercase':
+                $count--; //Se debe restar uno
+                do {
+                    $letters = chr(($count % 26) + ord('a')) . $letters;
+                    $count = intval($count / 26) - 1;
+                } while ($count >= 0);
+
+
+                $count = $letters;
+                break;
+            case 'leter_uppercase':
+                $count--; //Se debe restar uno
+                do {
+                    $letters = chr(($count % 26) + ord('A')) . $letters;
+                    $count = intval($count / 26) - 1;
+                } while ($count >= 0);
+
+
+                $count = $letters;
+                break;
+            case 'roman_numbers':
+                $count = $this->get_numbers_in_roman()[$count];
+                break;
+            default:
+                //Si no hay opción se deja por defecto
+                break;
+        }
+        return $count;
     }
 
     /**
