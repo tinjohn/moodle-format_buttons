@@ -25,6 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
+$string['privacy:metadata'] = 'This plugin does not store any user data';
 $string['addsections'] = 'Add section';
 $string['currentsection'] = 'This section';
 $string['deletesection'] = 'Delete section';
