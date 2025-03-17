@@ -449,7 +449,7 @@ class content extends content_base
     }
 
     /**
-     * Retornar la ultima sección del usuario
+     * Retornar la última sección del usuario
      * @param $courseid
      * @return array|bool|float|int|mixed|\stdClass|string
      * @throws \coding_exception
@@ -459,7 +459,11 @@ class content extends content_base
         global $USER;
 
         $cache = cache::make('format_buttons', 'user_last_section');
-        return $cache->get($USER->id . '_' . $courseid);
+        $section = $cache->get($USER->id . '_' . $courseid);
+        if (!$section) {
+            $section = 1;
+        }
+        return $section;
     }
 
     /**
@@ -469,7 +473,7 @@ class content extends content_base
      * @return array|\core_courseformat\output\local\section_info[]
      * @throws \moodle_exception
      */
-    private function get_sections_to_display(\course_modinfo $modinfo): array
+    protected function get_sections_to_display(\course_modinfo $modinfo): array
     {
         $singlesection = $this->format->get_section_number();
         if ($singlesection) {
