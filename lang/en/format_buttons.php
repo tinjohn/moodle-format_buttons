@@ -38,6 +38,7 @@ $string['newsectionname'] = 'New name for section {$a}';
 $string['pluginname'] = 'buttons Format';
 $string['sectionname'] = 'Section';
 $string['showfromothers'] = 'Show section';
+$string['cachedef_user_last_section'] = 'User last section cache';
 $string['fontcolor'] = 'Font color';
 $string['fontcolor_desc'] = 'Specify the font color for the buttons';
 $string['config'] = 'Plugin configuration';
