@@ -62,10 +62,18 @@ class section extends section_base
         $section_numer = $section->section ?? '0';
         $title_section_view = $course->title_section_view;
 
+        if (method_exists($format, 'get_sectionnum')) {
+            // For Moodle 4.4 and above.
+            $sectionreturnid = $format->get_sectionnum() ?? 0;
+        } else {
+            // Backward compatibility for Moodle 4.3 and below.
+            $sectionreturnid = $format->get_section_number();
+        }
+
         $data = (object)[
             'num' => $section_numer,
             'id' => $section->id,
-            'sectionreturnid' => $format->get_section_number(),
+            'sectionreturnid' => $sectionreturnid,
             'insertafter' => false,
             'summary' => $summary->export_for_template($output),
             'highlightedlabel' => $format->get_section_highlighted_name(),
