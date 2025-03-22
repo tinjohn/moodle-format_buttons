@@ -200,7 +200,7 @@ class format_buttons extends core_courseformat\base
         );
 
         $courseformatoptionsedit['selectform'] = array(
-            'label' => get_string('selectformbtn', 'format_buttons'),
+            'label' => get_string('selectform', 'format_buttons'),
             'help' => 'selectform',
             'help_component' => 'format_buttons',
             'element_type' => 'select',
