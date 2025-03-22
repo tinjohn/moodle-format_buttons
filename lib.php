@@ -27,7 +27,14 @@ class format_buttons extends core_courseformat\base
     protected function __construct($format, $courseid)
     {
         parent::__construct($format, $courseid);
-        $this->set_section_number(false);
+
+        if (method_exists($this, 'set_sectionnum')) {
+            // For Moodle 4.4 and above.
+            $this->set_sectionnum(null);
+        } else {
+            // Backward compatibility for Moodle 4.3 and below.
+            $this->set_section_number(0);
+        }
     }
 
     /**

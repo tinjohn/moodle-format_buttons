@@ -475,7 +475,14 @@ class content extends content_base
      */
     protected function get_sections_to_display(\course_modinfo $modinfo): array
     {
-        $singlesection = $this->format->get_section_number();
+        if (method_exists($this->format, 'get_sectionnum')) {
+            // For Moodle 4.4 and above.
+            $singlesection = $this->format->get_sectionnum() ?? 0;
+        } else {
+            // Backward compatibility for Moodle 4.3 and below.
+            $singlesection = $this->format->get_section_number();
+        }
+
         if ($singlesection) {
             return [
                 $modinfo->get_section_info(0),
