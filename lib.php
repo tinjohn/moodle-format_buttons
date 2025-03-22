@@ -313,6 +313,14 @@ class format_buttons extends core_courseformat\base
     {
         return true;
     }
+
+    /**
+     * @return void
+     */
+    static function set_sectionnum()
+    {
+
+    }
 }
 
 /**
@@ -324,6 +332,7 @@ class format_buttons extends core_courseformat\base
  * @param int $itemid
  * @param mixed $newvalue
  * @return inplace_editable
+ * @throws dml_exception
  */
 function format_buttons_inplace_editable($itemtype, $itemid, $newvalue)
 {
