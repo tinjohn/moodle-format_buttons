@@ -26,6 +26,7 @@
 namespace format_buttons\output\courseformat;
 
 use cache;
+use context_course;
 use context_system;
 use core_courseformat\output\local\content as content_base;
 use course_modinfo;
@@ -83,7 +84,13 @@ class content extends content_base
             $url->set_anchor("section-$section->section");
             $info->url = $url->out();
             $info->namesection = $section->section;
-            $info->disabled = $section->visible == 0 ? "disabled font-italic" : "";
+            //Filter capacibility, and fixed the disabled sections for the teacher
+            $isteacher = is_siteadmin() || has_capability('moodle/course:update', context_course::instance($course->id));
+            if ($section->visible == 0) {
+                $info->cssclass = "font-italic";
+                $info->disabled = !$isteacher ? "disabled" : "bg-secondary font-italic";
+            }
+
 
             $array_sections[] = $info;
         }
