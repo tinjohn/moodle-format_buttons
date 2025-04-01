@@ -313,14 +313,6 @@ class format_buttons extends core_courseformat\base
     {
         return true;
     }
-
-    /**
-     * @return void
-     */
-    static function set_sectionnum()
-    {
-
-    }
 }
 
 /**
