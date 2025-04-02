@@ -28,13 +28,16 @@ class format_buttons extends core_courseformat\base
     {
         parent::__construct($format, $courseid);
 
-        if (method_exists($this, 'set_sectionnum')) {
-            // For Moodle 4.4 and above.
+        global $CFG;
+
+        if (version_compare($CFG->version, '2024040100', '>=')) {
+            // Para Moodle 4.4 e acima.
             $this->set_sectionnum(null);
         } else {
-            // Backward compatibility for Moodle 4.3 and below.
+            // Compatibilidade com Moodle 4.3 e versões anteriores.
             $this->set_section_number(0);
         }
+
     }
 
     /**
