@@ -24,19 +24,13 @@ use core\output\inplace_editable;
  */
 class format_buttons extends core_courseformat\base
 {
+    /**
+     * @throws \core\exception\coding_exception
+     */
     protected function __construct($format, $courseid)
     {
         parent::__construct($format, $courseid);
-
-        global $CFG;
-
-        if (version_compare($CFG->version, '2024040100', '>=')) {
-            // Para Moodle 4.4 e acima.
-            $this->set_sectionnum(null);
-        } else {
-            // Compatibilidade com Moodle 4.3 e versões anteriores.
-            $this->set_section_number(0);
-        }
+        $this->set_sectionnum(null);
 
     }
 
