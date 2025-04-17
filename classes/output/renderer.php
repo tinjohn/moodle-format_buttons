@@ -13,6 +13,8 @@ namespace format_buttons\output;
 defined('MOODLE_INTERNAL') || die();
 
 use core_courseformat\output\section_renderer;
+use section_info;
+use stdClass;
 
 
 class renderer extends section_renderer {

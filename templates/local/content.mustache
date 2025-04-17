@@ -1,4 +1,36 @@
 {{!
+    @template format_buttons/local/content
+    Displays the complete course format.
+    Example context (json):
+    {
+        "title": "Course title",
+        "sections": [
+            {
+                "id": 1,
+                "num": 1,
+                "header": {
+                    "name": "Section title"
+                },
+                "summary": {
+                    "summarytext": "Summary"
+                },
+                "cmlist": {
+                    "hascms": true,
+                    "cms": [
+                        {
+                            "cmitem": {
+                                "cmid": 1,
+                                "module": "forum"
+                            }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+}}
+
+{{!
   Include the core content template.
   This is the top template for a course.
 }}

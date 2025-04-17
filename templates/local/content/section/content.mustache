@@ -1,3 +1,36 @@
+{{!
+    @template format_buttons/local/content/section/content
+    Internal content of a section.
+    Example context (json):
+    {
+        "num": 1,
+        "id": 10,
+        "header": {
+            "name": "Section title",
+            "headinglevel": 3
+        },
+        "summary": {
+            "summarytext": "Summary"
+        },
+        "cmlist": {
+            "hascms": true,
+            "cms": [
+                {
+                    "cmitem": {
+                        "cmid": 1,
+                        "module": "forum",
+                        "anchor": "activity-1"
+                    }
+                }
+            ]
+        },
+        "iscurrent": true,
+        "availability": {
+            "hasavailability": true
+        }
+    }
+}}
+
 <div id="coursecontentcollapse{{num}}"
      class="content {{^iscoursedisplaymultipage}}
          {{^sitehome}}course-content-item-content collapse {{^contentcollapsed}}show{{/contentcollapsed}}{{/sitehome}}

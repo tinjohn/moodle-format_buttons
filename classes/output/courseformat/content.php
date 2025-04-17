@@ -27,20 +27,23 @@ namespace format_buttons\output\courseformat;
 
 use cache;
 use context_course;
-use context_system;
 use core_courseformat\output\local\content as content_base;
 use course_modinfo;
-use Matrix\Exception;
 use moodle_url;
 use stdClass;
 use TypeError;
 
 class content extends content_base
 {
+    /**
+     * Actual section
+     *
+     * @var
+     */
     var $currentsection;
 
     /**
-     * Nombre de la plantilla
+     * Template name
      *
      * @param \renderer_base $renderer
      * @return string
@@ -51,7 +54,7 @@ class content extends content_base
     }
 
     /**
-     * Retornar la plantilla
+     * Return template
      *
      * @param \renderer_base $output
      * @return \stdClass
@@ -219,7 +222,7 @@ class content extends content_base
     }
 
     /**
-     * Agrupar las secciones, de acuerdo a la configuración
+     * Group sections
      *
      * @param $array_sections
      * @param $course
@@ -277,7 +280,8 @@ class content extends content_base
     }
 
     /**
-     * Retornar el namesection, para  una sección, solo funciona al formar los grupos
+     * Return namesection, if groups sections is active
+     *
      * @param $count
      * @param $course
      * @return mixed|string
@@ -286,10 +290,10 @@ class content extends content_base
     {
         switch ($course->selectoption) {
             case "number";
-                //Si es number se deja por defecto
+                //If number its default
                 break;
             case 'leter_lowercase':
-                $count--; //Se debe restar uno
+                $count--;
                 do {
                     $letters = chr(($count % 26) + ord('a')) . $letters;
                     $count = intval($count / 26) - 1;
@@ -299,7 +303,7 @@ class content extends content_base
                 $count = $letters;
                 break;
             case 'leter_uppercase':
-                $count--; //Se debe restar uno
+                $count--;
                 do {
                     $letters = chr(($count % 26) + ord('A')) . $letters;
                     $count = intval($count / 26) - 1;
@@ -312,14 +316,14 @@ class content extends content_base
                 $count = $this->get_numbers_in_roman()[$count];
                 break;
             default:
-                //Si no hay opción se deja por defecto
+                //If not option, Its default
                 break;
         }
         return $count;
     }
 
     /**
-     * Exportar las secciones, de acuerdo a la necesidad
+     * Export sections
      *
      * @param \renderer_base $output
      * @return array
@@ -341,7 +345,7 @@ class content extends content_base
         $stealthsections = [];
         $numsections = $format->get_last_section_number();
 
-        //Sección solicitada
+        //Current section
         $section_select = self::get_param_for_url(
             array('expandsection' => null,
                 'section' => null,
@@ -413,7 +417,7 @@ class content extends content_base
     }
 
     /**
-     * Retornar los parametros de la url
+     * Return params for url
      *
      * @param $params_need
      * @return mixed|string
@@ -443,7 +447,8 @@ class content extends content_base
     }
 
     /**
-     * Guardar la ultima sección a que se accedio
+     * Save the last section
+     *
      * @param $courseid
      * @param $section
      * @return void
@@ -456,7 +461,8 @@ class content extends content_base
     }
 
     /**
-     * Retornar la última sección del usuario
+     * Return the last sections
+     *
      * @param $courseid
      * @return array|bool|float|int|mixed|\stdClass|string
      * @throws \coding_exception
@@ -474,7 +480,7 @@ class content extends content_base
     }
 
     /**
-     * Reescribiendo la función
+     * Rewrite function
      *
      * @param course_modinfo $modinfo
      * @return array|\core_courseformat\output\local\section_info[]
@@ -482,13 +488,7 @@ class content extends content_base
      */
     protected function get_sections_to_display(\course_modinfo $modinfo): array
     {
-        if (method_exists($this->format, 'get_sectionnum')) {
-            // For Moodle 4.4 and above.
-            $singlesection = $this->format->get_sectionnum() ?? 0;
-        } else {
-            // Backward compatibility for Moodle 4.3 and below.
-            $singlesection = $this->format->get_section_number();
-        }
+        $singlesection = $this->format->get_sectionnum() ?? 0;
 
         if ($singlesection) {
             return [
@@ -501,7 +501,7 @@ class content extends content_base
     }
 
     /**
-     * Retornar las secciones, cuando se seleecione la opción de letras mayusculas
+     * Return section with the lowercase its selected
      *
      * @param array $array_sections
      * @return array
@@ -523,7 +523,7 @@ class content extends content_base
     }
 
     /**
-     * Retornar letras en minuscula, segun se requiera
+     * Return leter in lowercase
      *
      * @param $num
      * @param $baseChar
@@ -543,7 +543,7 @@ class content extends content_base
 
 
     /**
-     * Retornar las secciones, cuando se seleecione la opción de letras mayusculas
+     * Return section when uppercase its active
      *
      * @param array $array_sections
      * @return array
@@ -564,7 +564,7 @@ class content extends content_base
     }
 
     /**
-     * Convertir el parametro a letra segun se requiera
+     * Return param to the uppercase letter
      *
      * @param $num
      * @return string
@@ -583,7 +583,7 @@ class content extends content_base
 
 
     /**
-     * Array con los números romanos
+     * Array with roman numbers
      *
      * @return string[]
      */
@@ -609,7 +609,7 @@ class content extends content_base
     }
 
     /**
-     * Retornar cuando se indique la opción de números romanos
+     * Return sections when roman numbers is active
      *
      * @param array $array_sections
      * @return array
@@ -632,7 +632,7 @@ class content extends content_base
     }
 
     /**
-     * Retornar la imagen
+     * Return the image file
      *
      * @param $filearea
      * @param $file_name

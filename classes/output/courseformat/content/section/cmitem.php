@@ -31,8 +31,10 @@ class cmitem extends cmitem_base {
 
     /**
      * Returns the output class template path.
-     *
      * This method redirects the default template when the section activity item is rendered.
+     *
+     * @param \renderer_base $renderer
+     * @return string
      */
     public function get_template_name(\renderer_base $renderer): string {
         return 'format_buttons/local/content/section/cmitem';

@@ -34,6 +34,12 @@ use stdClass;
 class section extends section_base
 {
 
+    /**
+     * Construct
+     *
+     * @param course_format $format
+     * @param section_info $section
+     */
     public function __construct(course_format $format, section_info $section)
     {
         parent::__construct($format, $section);
@@ -41,8 +47,10 @@ class section extends section_base
 
     /**
      * Returns the output class template path.
-     *
      * This method redirects the default template when the course section is rendered.
+     *
+     * @param renderer_base $renderer
+     * @return string
      */
     public function get_template_name(\renderer_base $renderer): string
     {
@@ -50,6 +58,12 @@ class section extends section_base
         return 'format_buttons/local/content/section';
     }
 
+    /**
+     * Export template
+     *
+     * @param renderer_base $output
+     * @return stdClass
+     */
     public function export_for_template(renderer_base $output): stdClass
     {
         global $PAGE;
@@ -62,13 +76,7 @@ class section extends section_base
         $section_numer = $section->section ?? '0';
         $title_section_view = $course->title_section_view;
 
-        if (method_exists($format, 'get_sectionnum')) {
-            // For Moodle 4.4 and above.
-            $sectionreturnid = $format->get_sectionnum() ?? 0;
-        } else {
-            // Backward compatibility for Moodle 4.3 and below.
-            $sectionreturnid = $format->get_section_number();
-        }
+        $sectionreturnid = $format->get_sectionnum() ?? 0;
 
         $data = (object)[
             'num' => $section_numer,
@@ -96,8 +104,9 @@ class section extends section_base
     }
 
     /**
+     * Return section number
+     *
      * @return int
-     * Número de la sección
      */
     public function get_section_number()
     {

@@ -79,6 +79,7 @@ if ($ADMIN->fulltree) {
         $options[$counter] = get_string($str, 'format_buttons');
         $counter++;
     }
+
     $settings->add(new admin_setting_configselect(
         'format_buttons/max_groups',
         get_string('groups_course', 'format_buttons'),

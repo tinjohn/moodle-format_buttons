@@ -15,7 +15,7 @@ class provider implements null_provider
 {
 
     /**
-     * @inheritDoc
+     * @return string
      */
     public static function get_reason(): string
     {
