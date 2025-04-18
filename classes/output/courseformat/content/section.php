@@ -47,6 +47,14 @@ class section extends section_base
         parent::__construct($format, $section);
     }
 
+    /**
+     * Add editor base
+     *
+     * @param stdClass $data
+     * @param renderer_base $output
+     * @return bool
+     * @throws \coding_exception
+     */
     protected function add_editor_data(stdClass &$data, renderer_base $output): bool {
         $course = $this->format->get_course();
         $coursecontext = context_course::instance($course->id);

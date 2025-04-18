@@ -442,6 +442,7 @@ class content extends content_base
                 $section_select = $section_select->section;
             }
         }
+
         $this->section_select = $section_select;
     }
 
