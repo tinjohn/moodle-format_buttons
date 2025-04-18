@@ -355,7 +355,8 @@ class content extends content_base
         } else {
             $this->currentsection = $section_select;
         }
-        $format->set_sectionnum($section_select);
+        $format->set_sectionnum($this->currentsection);
+
         foreach ($this->get_sections_to_display($modinfo) as $thissection) {
             // The course/view.php check the section existence but the output can be called
             // from other parts so we need to check it.
@@ -446,7 +447,7 @@ class content extends content_base
     INNER JOIN {modules} AS allmodules ON module.module = allmodules.id
     WHERE section.id = :sectionid AND allmodules.name = :modulename
 ";
-                $params = array('sectionid' => 853, 'modulename' => 'subsection');
+                $params = array('sectionid' => $id, 'modulename' => 'subsection');
 
                 $result = $DB->get_record_sql($sql, $params);
                 $section_select = $DB->get_record('course_sections', ['id' => $result->section], '*', MUST_EXIST)->section;

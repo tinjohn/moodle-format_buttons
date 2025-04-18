@@ -78,7 +78,7 @@ class format_buttons extends core_courseformat\base
     public function supports_ajax()
     {
         $ajaxsupport = new stdClass();
-        $ajaxsupport->capable = false;
+        $ajaxsupport->capable = true;
         return $ajaxsupport;
     }
 
