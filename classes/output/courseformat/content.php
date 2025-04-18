@@ -27,6 +27,7 @@ namespace format_buttons\output\courseformat;
 
 use cache;
 use context_course;
+use core_courseformat\base as course_format;
 use core_courseformat\output\local\content as content_base;
 use course_modinfo;
 use moodle_url;
@@ -55,6 +56,16 @@ class content extends content_base
      * @var null
      */
     var $section_select = null;
+
+    /**
+     * Construct
+     *
+     * @param course_format $format
+     */
+    public function __construct(course_format $format)
+    {
+        parent::__construct($format);
+    }
 
     /**
      * Template name

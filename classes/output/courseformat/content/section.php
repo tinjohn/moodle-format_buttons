@@ -25,8 +25,10 @@
 
 namespace format_buttons\output\courseformat\content;
 
+use context_course;
 use core_courseformat\base as course_format;
 use core_courseformat\output\local\content\section as section_base;
+use format_buttons\classes\output\courseformat\content\section\controlmenu;
 use renderer_base;
 use section_info;
 use stdClass;
@@ -43,6 +45,32 @@ class section extends section_base
     public function __construct(course_format $format, section_info $section)
     {
         parent::__construct($format, $section);
+    }
+
+    protected function add_editor_data(stdClass &$data, renderer_base $output): bool {
+        $course = $this->format->get_course();
+        $coursecontext = context_course::instance($course->id);
+        $editcaps = [];
+        if (has_capability('moodle/course:sectionvisibility', $coursecontext)) {
+            $editcaps = ['moodle/course:sectionvisibility'];
+        }
+        if (!$this->format->show_editor($editcaps)) {
+            return false;
+        }
+
+        // In a single section page the control menu is located in the page header.
+        if (empty($this->hidecontrols) && $this->format->get_sectionid() != $this->section->id) {
+            $controlmenu = new $this->controlmenuclass($this->format, $this->section);
+            $data->controlmenu = $controlmenu->export_for_template($output);
+        }
+        if (!$this->isstealth) {
+            $data->cmcontrols = $output->course_section_add_cm_control(
+                $course,
+                $this->section->section,
+                $this->format->get_sectionnum()
+            );
+        }
+        return true;
     }
 
     /**
@@ -89,8 +117,11 @@ class section extends section_base
             'editing' => $PAGE->user_is_editing(),
             //propios
             'title_section' => $title_section_view,
-            'title' => get_section_name($course, $section)
+            'title' => get_section_name($course, $section),
         ];
+
+        $controlmenu = new controlmenu($format, $section);
+        $data->controlmenu = $controlmenu->export_for_template($output);
 
         $haspartials = [];
         $haspartials['availability'] = $this->add_availability_data($data, $output);
@@ -98,8 +129,8 @@ class section extends section_base
         $haspartials['editor'] = $this->add_editor_data($data, $output);
         $haspartials['header'] = $this->add_header_data($data, $output);
         $haspartials['cm'] = $this->add_cm_data($data, $output);
-        $this->add_format_data($data, $haspartials, $output);
 
+        $this->add_format_data($data, $haspartials, $output);
         return $data;
     }
 
