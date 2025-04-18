@@ -50,6 +50,13 @@ class content extends content_base
     var $subsectionselectd = false;
 
     /**
+     * Section select
+     *
+     * @var null
+     */
+    var $section_select = null;
+
+    /**
      * Template name
      *
      * @param \renderer_base $renderer
@@ -105,31 +112,8 @@ class content extends content_base
             $array_sections[] = $info;
         }
 
-        $section_select = self::get_param_for_url(
-            ['id' => null]);
-        //Check that section, if btween total sections
-        $maxindex = count($all_sections) - 1;
-        if ($section_select > $maxindex || $section_prev > $maxindex) {
-            $section_select = 0;
-            self::save_last_section_access($course->id, null);
-        }
-
-        if (!is_null($section_select)) {
-            if ($section_select == "0" && !$course->section_zero_ubication) {
-                if (isset($array_sections[1])) {
-                    $array_sections[1]->selected = true;
-                    self::save_last_section_access($course->id, 1);
-                }
-            } else {
-                $array_sections[$section_select]->selected = true;
-                self::save_last_section_access($course->id, $section_select);
-            }
-        } else {
-            $section = self::get_last_section_access($course->id);
-            if ($section && isset($array_sections[$section])) {
-                $array_sections[$section]->selected = true;
-            }
-        }
+        $this->get_param_for_url();
+        $array_sections = $this->get_array_sections($all_sections, $section_prev, $course, $array_sections);
 
         $sections = $this->export_sections($output);
         if (!$course->section_zero_ubication) {
@@ -341,9 +325,7 @@ class content extends content_base
         $numsections = $format->get_last_section_number();
 
         //Current section
-        $section_select = self::get_param_for_url(
-            array('id' => null));
-
+        $section_select = $this->section_select;
         if (!$section_select) {
             $last = self::get_last_section_access($course->id);
             if ($last) {
@@ -355,6 +337,7 @@ class content extends content_base
         } else {
             $this->currentsection = $section_select;
         }
+
         $format->set_sectionnum($this->currentsection);
 
         foreach ($this->get_sections_to_display($modinfo) as $thissection) {
@@ -412,26 +395,17 @@ class content extends content_base
     /**
      * Return params for url
      *
-     * @param $params_need
-     * @return mixed|string
+     * @return void|null
      * @throws \coding_exception
      * @throws \core\exception\coding_exception
-     * @throws \core\exception\moodle_exception
      * @throws \dml_exception
      */
-    private function get_param_for_url($params_need)
+    private function get_param_for_url()
     {
         global $PAGE, $DB;
 
         $section_select = null;
 
-        foreach ($params_need as $param => $value) {
-            $param_value = optional_param($param, null, PARAM_INT);
-            if ($param_value != "") {
-                $section_select = $param_value;
-                break;
-            }
-        }
         $id = optional_param('id', null, PARAM_INT);
         //If its url view course, return null
         if ($PAGE->url->out_as_local_url(false) === '/course/view.php?id=' . $id) {
@@ -457,8 +431,7 @@ class content extends content_base
                 $section_select = $section_select->section;
             }
         }
-
-        return $section_select;
+        $this->section_select = $section_select;
     }
 
     /**
@@ -685,5 +658,42 @@ class content extends content_base
         } else {
             return "";
         }
+    }
+
+    /**
+     * Get array sections
+     *
+     * @param mixed $section_prev
+     * @param bool|stdClass|null $course
+     * @param array $array_sections
+     * @return array
+     * @throws \coding_exception
+     */
+    public function get_array_sections($all_sections, $section_prev, $course, $array_sections)
+    {
+        //Check that section, if btween total sections
+        $maxindex = count($all_sections) - 1;
+        if ($this->section_select > $maxindex || $section_prev > $maxindex) {
+            $this->section_select = 0;
+            self::save_last_section_access($course->id, null);
+        }
+
+        if (!is_null($this->section_select)) {
+            if ($this->section_select == "0" && !$course->section_zero_ubication) {
+                if (isset($array_sections[1])) {
+                    $array_sections[1]->selected = true;
+                    self::save_last_section_access($course->id, 1);
+                }
+            } else {
+                $array_sections[$this->section_select]->selected = true;
+                self::save_last_section_access($course->id, $this->section_select);
+            }
+        } else {
+            $section = self::get_last_section_access($course->id);
+            if ($section && isset($array_sections[$section])) {
+                $array_sections[$section]->selected = true;
+            }
+        }
+        return $array_sections;
     }
 }
