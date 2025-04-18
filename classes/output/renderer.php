@@ -40,7 +40,5 @@ class renderer extends section_renderer {
     public function section_title_without_link($section, $course) {
         return $this->render(course_get_format($course)->inplace_editable_render_section_name($section, false));
     }
-
-
 }
 

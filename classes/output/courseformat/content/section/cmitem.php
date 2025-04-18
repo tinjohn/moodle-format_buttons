@@ -27,7 +27,8 @@ namespace format_buttons\classes\output\courseformat\content\section;
 
 use core_courseformat\output\local\content\section\cmitem as cmitem_base;
 
-class cmitem extends cmitem_base {
+class cmitem extends cmitem_base
+{
 
     /**
      * Returns the output class template path.
@@ -36,7 +37,8 @@ class cmitem extends cmitem_base {
      * @param \renderer_base $renderer
      * @return string
      */
-    public function get_template_name(\renderer_base $renderer): string {
+    public function get_template_name(\renderer_base $renderer): string
+    {
         return 'format_buttons/local/content/section/cmitem';
     }
 }
