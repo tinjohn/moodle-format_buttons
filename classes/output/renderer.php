@@ -28,13 +28,28 @@ namespace format_buttons\output;
 
 defined('MOODLE_INTERNAL') || die();
 
-use core_courseformat\output\section_renderer;
+use core_courseformat\output\section_renderer as core_section_renderer;
+use core_courseformat\base as course_format;
 use section_info;
-use stdClass;
 
 
-class renderer extends \core_courseformat\output\site_renderer
+class renderer extends core_section_renderer
 {
+
+    /**
+     * Course update section
+     *
+     * @param course_format $format
+     * @param section_info $section
+     * @return string
+     * @throws \core\exception\coding_exception
+     */
+    public function course_section_updated(course_format $format, section_info $section): string
+    {
+        $classname = $format->get_output_classname('content\\section');
+        $renderable = new $classname($format, $section);
+        return $this->render($renderable);
+    }
 
 }
 

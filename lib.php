@@ -37,30 +37,6 @@ class format_buttons extends core_courseformat\base
     }
 
     /**
-     * Custom action after a section has been moved (Ajax mode).
-     *
-     * @return array Data para la respuesta JSON (se enviará al front-end).
-     */
-    public function ajax_section_move(): array {
-        global $PAGE;
-        $renderer = $this->get_renderer($PAGE);
-        $modinfo  = $this->get_modinfo();
-        $titles   = [];
-        $current  = -1;
-        foreach ($modinfo->get_section_info_all() as $num => $section) {
-            $titles[$num] = $renderer->section_title($section, $this->get_course());
-            if ($this->is_section_current($section)) {
-                $current = $num;
-            }
-        }
-        return [
-            'sectiontitles' => $titles,
-            'current'       => $current,
-            'action'        => 'move'
-        ];
-    }
-
-    /**
      * Returns true if this course format uses sections.
      *
      * @return bool
