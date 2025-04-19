@@ -43,3 +43,7 @@ About
 * [Rodrigo Brandão](https://github.com/brandaorodrigo) (author)
 * [Moodle plugin page](https://moodle.org/plugins/format_buttons) at Moodle.org
 * [Plugin project](https://github.com/brandaorodrigo/moodle-format_buttons) at GitHub.com
+
+## 📄 Notas de versión
+
+Consulta el [CHANGELOG aquí](CHANGELOG.md).
