@@ -5,4 +5,4 @@
 - Updated plugin structure to match Moodle’s official guidelines.
 
 > ⚠️ The previous structure was compatible with early versions of Moodle 4.1 (pre-stable).  
-> This update ensures full compatibility with Moodle 4.1+ stable releases.
+> This update ensures full compatibility with Moodle 5.x.
