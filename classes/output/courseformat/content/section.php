@@ -25,7 +25,8 @@
 
 namespace format_buttons\output\courseformat\content;
 
-use context_course;
+defined('MOODLE_INTERNAL') || die();
+
 use core_courseformat\base as course_format;
 use core_courseformat\output\local\content\section as section_base;
 use format_buttons\classes\output\courseformat\content\section\controlmenu;
@@ -37,7 +38,7 @@ class section extends section_base
 {
 
     /**
-     * Construct
+     * constructor
      *
      * @param course_format $format
      * @param section_info $section
@@ -45,111 +46,35 @@ class section extends section_base
     public function __construct(course_format $format, section_info $section)
     {
         parent::__construct($format, $section);
+
+        $this->headerclass = 'format_buttons\\classes\\output\\courseformat\\content\\section\\header';
     }
 
     /**
-     * Add editor base
-     *
-     * @param stdClass $data
-     * @param renderer_base $output
-     * @return bool
-     * @throws \coding_exception
-     */
-    protected function add_editor_data(stdClass &$data, renderer_base $output): bool {
-        $course = $this->format->get_course();
-        $coursecontext = context_course::instance($course->id);
-        $editcaps = [];
-        if (has_capability('moodle/course:sectionvisibility', $coursecontext)) {
-            $editcaps = ['moodle/course:sectionvisibility'];
-        }
-        if (!$this->format->show_editor($editcaps)) {
-            return false;
-        }
-
-        // In a single section page the control menu is located in the page header.
-        if (empty($this->hidecontrols) && $this->format->get_sectionid() != $this->section->id) {
-            $controlmenu = new $this->controlmenuclass($this->format, $this->section);
-            $data->controlmenu = $controlmenu->export_for_template($output);
-        }
-        if (!$this->isstealth) {
-            $data->cmcontrols = $output->course_section_add_cm_control(
-                $course,
-                $this->section->section,
-                $this->format->get_sectionnum()
-            );
-        }
-        return true;
-    }
-
-    /**
-     * Returns the output class template path.
-     * This method redirects the default template when the course section is rendered.
+     * Template name
      *
      * @param renderer_base $renderer
      * @return string
      */
     public function get_template_name(\renderer_base $renderer): string
     {
-
         return 'format_buttons/local/content/section';
     }
 
     /**
-     * Export template
+     * Export for template
      *
      * @param renderer_base $output
      * @return stdClass
      */
     public function export_for_template(renderer_base $output): stdClass
     {
-        global $PAGE;
+        $data = parent::export_for_template($output);
 
-        $format = $this->format;
-        $course = $format->get_course();
-        $section = $this->section;
-
-        $summary = new $this->summaryclass($format, $section);
-        $section_numer = $section->section ?? '0';
-        $title_section_view = $course->title_section_view;
-
-        $sectionreturnid = $format->get_sectionnum() ?? 0;
-
-        $data = (object)[
-            'num' => $section_numer,
-            'id' => $section->id,
-            'sectionreturnid' => $sectionreturnid,
-            'insertafter' => false,
-            'summary' => $summary->export_for_template($output),
-            'highlightedlabel' => $format->get_section_highlighted_name(),
-            'sitehome' => $course->id == SITEID,
-            'editing' => $PAGE->user_is_editing(),
-            //propios
-            'title_section' => $title_section_view,
-            'title' => get_section_name($course, $section),
-        ];
-
-        $controlmenu = new controlmenu($format, $section);
+        $controlmenu = new controlmenu($this->format, $this->section);
         $data->controlmenu = $controlmenu->export_for_template($output);
 
-        $haspartials = [];
-        $haspartials['availability'] = $this->add_availability_data($data, $output);
-        $haspartials['visibility'] = $this->add_visibility_data($data, $output);
-        $haspartials['editor'] = $this->add_editor_data($data, $output);
-        $haspartials['header'] = $this->add_header_data($data, $output);
-        $haspartials['cm'] = $this->add_cm_data($data, $output);
-
-        $this->add_format_data($data, $haspartials, $output);
         return $data;
-    }
-
-    /**
-     * Return section number
-     *
-     * @return int
-     */
-    public function get_section_number()
-    {
-        return $this->section->section;
     }
 
 

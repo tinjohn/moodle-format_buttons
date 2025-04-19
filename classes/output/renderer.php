@@ -33,28 +33,8 @@ use section_info;
 use stdClass;
 
 
-class renderer extends section_renderer {
+class renderer extends \core_courseformat\output\site_renderer
+{
 
-    /**
-     * Generate the section title, wraps it in a link to the section page if page is to be displayed on a separate page.
-     *
-     * @param section_info|stdClass $section The course_section entry from DB
-     * @param stdClass $course The course entry from DB
-     * @return string HTML to output.
-     */
-    public function section_title($section, $course) {
-        return $this->render(course_get_format($course)->inplace_editable_render_section_name($section));
-    }
-
-    /**
-     * Generate the section title to be displayed on the section page, without a link.
-     *
-     * @param section_info|stdClass $section The course_section entry from DB
-     * @param int|stdClass $course The course entry from DB
-     * @return string HTML to output.
-     */
-    public function section_title_without_link($section, $course) {
-        return $this->render(course_get_format($course)->inplace_editable_render_section_name($section, false));
-    }
 }
 

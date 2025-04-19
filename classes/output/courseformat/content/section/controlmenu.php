@@ -25,33 +25,15 @@
 
 namespace format_buttons\classes\output\courseformat\content\section;
 
-use core\exception\moodle_exception;
-use core\output\action_menu\link;
-use core\output\action_menu\link_secondary;
-use core\output\pix_icon;
-use core\url;
-use core_courseformat\base as course_format;
+defined('MOODLE_INTERNAL') || die();
+
 use format_topics\output\courseformat\content\section\controlmenu as controlmenu_format_topics;
-use section_info;
 
 
 class controlmenu extends controlmenu_format_topics
 {
-
     /**
-     * construct
-     *
-     * @param course_format $format
-     * @param section_info $section
-     */
-    public function __construct(course_format $format, section_info $section)
-    {
-        parent::__construct($format, $section);
-        $this->baseurl = new \moodle_url("/course/view.php");
-    }
-
-    /**
-     * Export template name
+     * Get mustache name
      *
      * @param \renderer_base $renderer
      * @return string
@@ -62,11 +44,9 @@ class controlmenu extends controlmenu_format_topics
     }
 
     /**
-     * Items to the control
+     * Itemst to the controlmenu
      *
      * @return array
-     * @throws \coding_exception
-     * @throws moodle_exception
      */
     public function section_control_items()
     {
@@ -86,77 +66,4 @@ class controlmenu extends controlmenu_format_topics
 
         return $controls;
     }
-
-    /**
-     * Return move sections item
-     *
-     * @return link|null
-     * @throws \coding_exception
-     * @throws moodle_exception
-     */
-    protected function get_section_movesection_item(): ?link
-    {
-        if (
-            $this->section->sectionnum == 0
-            || !has_capability('moodle/course:movesections', $this->coursecontext)
-        ) {
-            return null;
-        }
-
-        $url = new url(
-            $this->baseurl,
-            [
-                'movesection' => $this->section->sectionnum,
-                'section' => $this->section->sectionnum,
-            ]
-        );
-
-        return new link_secondary(
-            url: $url,
-            icon: new pix_icon('i/dragdrop', ''),
-            text: get_string('move'),
-            attributes: [
-                // This tool requires ajax and will appear only when the frontend state is ready.
-                'class' => 'move waitstate',
-                'data-action' => 'moveSection',
-                'data-id' => $this->section->id,
-            ],
-        );
-    }
-
-    /**
-     * Duplicate sections
-     *
-     * @return link|null
-     * @throws \coding_exception
-     * @throws \core\exception\moodle_exception
-     */
-    protected function get_section_duplicate_item(): ?link
-    {
-        if (
-            $this->section->sectionnum == 0
-            || !has_capability('moodle/course:update', $this->coursecontext)
-        ) {
-            return null;
-        }
-
-        $url = new url(
-            $this->baseurl,
-            [
-                'id' => $this->course->id,
-                'sectionid' => $this->section->id,
-                'duplicatesection' => 1,
-                'sesskey' => sesskey(),
-            ]
-        );
-
-        return new link_secondary(
-            url: $url,
-            icon: new pix_icon('t/copy', ''),
-            text: get_string('duplicate'),
-            attributes: ['class' => 'duplicate'],
-        );
-    }
-
-
 }

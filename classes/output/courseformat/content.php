@@ -25,50 +25,65 @@
 
 namespace format_buttons\output\courseformat;
 
-use cache;
+defined('MOODLE_INTERNAL') || die();
+
 use context_course;
+use core\exception\moodle_exception;
 use core_courseformat\base as course_format;
 use core_courseformat\output\local\content as content_base;
-use course_modinfo;
 use moodle_url;
 use stdClass;
-use TypeError;
+
 
 class content extends content_base
 {
     /**
-     * Section actual
-     *
+     * All sections
      * @var
      */
-    var $currentsection;
-
+    private $array_sections;
     /**
-     * Indicate if currentsections is subsection
-     *
-     * @var bool
+     * @var string
      */
-    var $subsectionselectd = false;
-
+    private $form_btn;
     /**
-     * Section select
-     *
-     * @var null
+     * @var int
      */
-    var $section_select = null;
+    private $selected_section;
 
     /**
-     * Construct
-     *
-     * @param course_format $format
+     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function __construct(course_format $format)
     {
         parent::__construct($format);
+
+        $this->set_array_sections();
+        //rounded btns
+        switch ($format->get_course()->selectform) {
+            case 'rounded':
+                $this->form_btn = "50%";
+                break;
+            default:
+                $this->form_btn = "0%";
+                break;
+        }
+        if ($format->get_sectionnum()) {
+            $this->selected_section = $format->get_sectionnum();
+            $format->set_sectionnum(null);
+        } else {
+            if ($format->get_course()->section_zero_ubication) {
+                $this->selected_section = 0;
+            } else {
+                $this->selected_section = 1;
+            }
+        }
     }
 
     /**
-     * Template name
+     * Get template
      *
      * @param \renderer_base $renderer
      * @return string
@@ -79,15 +94,97 @@ class content extends content_base
     }
 
     /**
-     * Return template
+     * Export data for template
      *
      * @param \renderer_base $output
-     * @return \stdClass
-     * @throws \coding_exception
-     * @throws \dml_exception
+     * @return object
      * @throws \moodle_exception
      */
-    public function export_for_template(\renderer_base $output): \stdClass
+    public function export_for_template(\renderer_base $output)
+    {
+        $format = $this->format;
+        $format->set_sectionnum(null);
+
+        $data = (object)[
+            'title' => $format->page_title(), // This method should be in the course_format class.
+            'initialsection' => $this->get_initialsection($output),
+            'sections' => [$this->get_export_section($output)],
+            'format' => $format->get_format(),
+            'sectionreturn' => null,
+            'all_sections' => $this->array_sections,
+            'bgcolor' => $this->format->get_course()->bgcolor,
+            'colorfont' => $this->format->get_course()->colorfont,
+            'bgcolor_selected' => $this->format->get_course()->bgcolor_selected,
+            'fontcolor_selected' => $this->format->get_course()->fontcolor_selected,
+            'form_btn' => $this->form_btn,
+            'singlesection' => null,
+        ];
+
+        if ($this->hasaddsection) {
+            $addsection = new $this->addsectionclass($format);
+            $data->numsections = $addsection->export_for_template($output);
+        }
+
+        if ($format->show_editor()) {
+            $bulkedittools = new $this->bulkedittoolsclass($format);
+            $data->bulkedittools = $bulkedittools->export_for_template($output);
+        }
+        //If there is a img to init sections, return data
+        $file_setting = get_config('format_buttons', 'image_sections');
+        if ($file_setting != "") {
+            $data->image_init_sectios = $this->get_content_file('format_buttons_file', get_config('format_buttons', 'image_sections'));
+        }
+
+        return $data;
+    }
+
+    /**
+     * Use in reemplace to export_sections
+     *
+     * @param $output
+     * @return null
+     * @throws \core\exception\coding_exception
+     * @throws \moodle_exception
+     */
+    public function get_export_section($output)
+    {
+        $course = $this->format->get_course();
+        $modinfo = get_fast_modinfo($course);
+        $sectioninfo = $modinfo->get_section_info($this->selected_section);
+        $sectionclass = $this->format->get_output_classname('content\\section');
+        $sectionoutput = new $sectionclass($this->format, $sectioninfo);
+        return $sectionoutput->export_for_template($output);
+    }
+
+    /**
+     * Return section 0
+     *
+     * @param $output
+     * @return mixed
+     * @throws \core\exception\coding_exception
+     * @throws \moodle_exception
+     */
+    public function get_initialsection($output)
+    {
+        $course = $this->format->get_course();
+        if ($course->section_zero_ubication) {
+            return null;
+        }
+        $modinfo = get_fast_modinfo($course);
+        $sectioninfo = $modinfo->get_section_info(0);
+        $sectionclass = $this->format->get_output_classname('content\\section');
+        $sectionoutput = new $sectionclass($this->format, $sectioninfo);
+        return $sectionoutput->export_for_template($output);
+    }
+
+    /**
+     * Set array sections
+     *
+     * @throws moodle_exception
+     * @throws \coding_exception
+     * @throws \dml_exception
+     */
+    private function set_array_sections()
     {
         global $DB;
         $format = $this->format;
@@ -96,7 +193,6 @@ class content extends content_base
         $array_sections = array();
 
         $all_sections = $DB->get_records('course_sections', array('course' => $course->id, 'component' => null), "section");
-        $section_prev = self::get_last_section_access($course->id);
         foreach ($all_sections as $section) {
             $info = new \stdClass();
             $info->component = $section->component;
@@ -106,6 +202,11 @@ class content extends content_base
             if ($course->section_zero_ubication) {
                 $info->body = true;
             }
+            //Ad class selected
+            if ($section->section == $format->get_sectionnum()) {
+                $info->selected = true;
+            }
+
             $url = new moodle_url("/course/section.php", array(
                 'id' => $section->id
             ));
@@ -119,16 +220,7 @@ class content extends content_base
                 $info->disabled = !$isteacher ? "disabled" : "bg-secondary font-italic";
             }
 
-
             $array_sections[] = $info;
-        }
-
-        $this->get_param_for_url();
-        $array_sections = $this->get_array_sections($all_sections, $section_prev, $course, $array_sections);
-
-        $sections = $this->export_sections($output);
-        if (!$course->section_zero_ubication) {
-            $sections[0]->section = 1;
         }
 
         switch ($course->selectoption) {
@@ -148,72 +240,75 @@ class content extends content_base
 
         $array_sections = $this->agruping_sections($array_sections, $course);
 
-        switch ($course->selectform) {
-            case 'rounded':
-                $form_btn = "50%";
-                break;
-            default:
-                $form_btn = "0%";
-                break;
-        }
-
-        $course->bgcolor = $course->bgcolor != "" ? $course->bgcolor : get_config('format_buttons', 'bgcolor');
-        $course->colorfont = $course->colorfont != "" ? $course->colorfont : get_config('format_buttons', 'fontcolor');
-        $course->bgcolor_selected = $course->bgcolor_selected != "" ? $course->bgcolor_selected : get_config('format_buttons', 'bgcolor_selected');
-        $course->fontcolor_selected = $course->fontcolor_selected != "" ? $course->fontcolor_selected : get_config('format_buttons', 'fontcolor_selected');;
-
-        $data = (object)[
-            'title' => $format->page_title(),
-            'sections' => $sections,
-            'all_sections' => $array_sections,
-            'format' => $format->get_format(),
-            'sectionclasses' => '',
-            'bgcolor' => $course->bgcolor,
-            'colorfont' => $course->colorfont,
-            'bgcolor_selected' => $course->bgcolor_selected,
-            'fontcolor_selected' => $course->fontcolor_selected,
-            'form_btn' => $form_btn,
-        ];
-
-        if ($format->show_editor()) {
-            $bulkedittools = new $this->bulkedittoolsclass($format);
-            $data->bulkedittools = $bulkedittools->export_for_template($output);
-        }
-
-        $sectionnavigation = new $this->sectionnavigationclass($format, $this->currentsection);
-
-        $data->sectionnavigation = $sectionnavigation->export_for_template($output);
-
-        $sectionselector = new $this->sectionselectorclass($format, $sectionnavigation);
-        try {
-            $data->sectionselector = $sectionselector->export_for_template($output);
-        } catch (TypeError $e) {
-            $this->currentsection = 0;
-            $sectionnavigation = new $this->sectionnavigationclass($format, $this->currentsection);
-
-            $data->sectionnavigation = $sectionnavigation->export_for_template($output);
-
-            $sectionselector = new $this->sectionselectorclass($format, $sectionnavigation);
-            $data->sectionselector = $sectionselector->export_for_template($output);
-        }
-
-        $url = new moodle_url("/course/changenumsections.php",
-            array('courseid' => $course->id, 'insertsection' => 0, 'sesskey' => sesskey()));
-        $data->url_add_section = $url;
-
-        $file_setting = get_config('format_buttons', 'image_sections');
-        if ($file_setting != "") {
-
-            $url_1 = $this->get_content_file('format_buttons_file', get_config('format_buttons', 'image_sections'));
-
-            $data->image_init_sectios = $url_1;
-        }
-
-        return $data;
+        $this->array_sections = $array_sections;
     }
 
     /**
-     * Group sections
+     * lowercase leter
+     *
+     * @param array $array_sections
+     * @return array
+     */
+    private function leter_lowercase(array $array_sections)
+    {
+        $count = 0;
+        $format = $this->format;
+        $course = $format->get_course();
+        foreach ($array_sections as $array_section) {
+
+            if (empty($array_section->namesection) && !$course->section_zero_ubication) continue;
+            $array_section->namesection = $this->convert_lowercase_letter($count, 'a');
+            $count++;
+        }
+
+        return $array_sections;
+    }
+
+    /**
+     * Return sections in uppercase
+     *
+     * @param array $array_sections
+     * @return array
+     */
+    private function leter_uppercase(array $array_sections)
+    {
+        $count = 0;
+        $format = $this->format;
+        $course = $format->get_course();
+        foreach ($array_sections as $array_section) {
+            if (empty($array_section->namesection) && !$course->section_zero_ubication) continue;
+            $array_section->namesection = $this->convert_uppercase_letter($count);
+            $count++;
+        }
+
+        return $array_sections;
+    }
+
+    /**
+     * Return sections in roman numbers
+     *
+     * @param array $array_sections
+     * @return array
+     */
+    private function roman_numbers(array $array_sections)
+    {
+        $options = $this->get_numbers_in_roman();
+        $count = 1;
+        $format = $this->format;
+        $course = $format->get_course();
+        foreach ($array_sections as $array_section) {
+
+            if (empty($array_section->namesection) && !$course->section_zero_ubication) continue;
+
+            $array_section->namesection = $options[$count];
+            $count++;
+        }
+
+        return $array_sections;
+    }
+
+    /**
+     * Groping sections
      *
      * @param $array_sections
      * @param $course
@@ -257,7 +352,6 @@ class content extends content_base
                     $count++;
                     if ($total_count_group >= $count) continue;
                     $count_first_btn_section++;
-                    //echo "total: " . $total_count_group . " count: " . $count . "<br>";
                     $section->bgcolor = $atribute_section->color != "" ? $atribute_section->color : $section->bgcolor;
                     $section->namesection = $num_sections == 1 ? "..." : $this->get_namesection_for_btn($count - $total_count_group, $course);
                     if ($atribute_section->title != "" && $count_first_btn_section == 1) {
@@ -271,258 +365,7 @@ class content extends content_base
     }
 
     /**
-     * Return namesection, if groups sections is active
-     *
-     * @param $count
-     * @param $course
-     * @return mixed|string
-     */
-    public function get_namesection_for_btn($count, $course)
-    {
-        switch ($course->selectoption) {
-            case "number";
-                //If number its default
-                break;
-            case 'leter_lowercase':
-                $count--;
-                do {
-                    $letters = chr(($count % 26) + ord('a')) . $letters;
-                    $count = intval($count / 26) - 1;
-                } while ($count >= 0);
-
-
-                $count = $letters;
-                break;
-            case 'leter_uppercase':
-                $count--;
-                do {
-                    $letters = chr(($count % 26) + ord('A')) . $letters;
-                    $count = intval($count / 26) - 1;
-                } while ($count >= 0);
-
-
-                $count = $letters;
-                break;
-            case 'roman_numbers':
-                $count = $this->get_numbers_in_roman()[$count];
-                break;
-            default:
-                //If not option, Its default
-                break;
-        }
-        return $count;
-    }
-
-    /**
-     * Export sections
-     *
-     * @param \renderer_base $output
-     * @return array
-     * @throws \coding_exception
-     * @throws \moodle_exception
-     */
-    public function export_sections(\renderer_base $output): array
-    {
-        $format = $this->format;
-        $course = $format->get_course();
-        $modinfo = $this->format->get_modinfo();
-
-        $realcoursedisplay = property_exists($course, 'realcoursedisplay') ? $course->realcoursedisplay : false;
-        $firstsectionastab = ($realcoursedisplay == COURSE_DISPLAY_MULTIPAGE) ? 1 : 0;
-
-        // Generate section list.
-        $sections = [];
-        $stealthsections = [];
-        $numsections = $format->get_last_section_number();
-
-        //Current section
-        $section_select = $this->section_select;
-        if (!$section_select) {
-            $last = self::get_last_section_access($course->id);
-            if ($last) {
-                $this->currentsection = $last;
-                $section_select = $last;
-            } else {
-                $this->currentsection = $course->section_zero_ubication ? 0 : 1;
-            }
-        } else {
-            $this->currentsection = $section_select;
-        }
-
-        $format->set_sectionnum($this->currentsection);
-
-        foreach ($this->get_sections_to_display($modinfo) as $thissection) {
-            // The course/view.php check the section existence but the output can be called
-            // from other parts so we need to check it.
-            if (!$thissection) {
-                throw new \moodle_exception('unknowncoursesection', 'error', course_get_url($course), s($course->fullname));
-            }
-
-            $section = new $this->sectionclass($format, $thissection);
-            $sectionnum = $section->get_section_number();
-
-            if ($course->section_zero_ubication || $this->subsectionselectd) {
-                if ($this->currentsection != $sectionnum) {
-                    continue;
-                }
-            } else {
-                if (!$this->currentsection) {
-                    if ($sectionnum > 1) {
-                        continue;
-                    }
-                } else {
-                    if ($sectionnum != 0 and $sectionnum != $section_select) {
-                        continue;
-                    }
-                }
-                if ($sectionnum === 0 && $firstsectionastab) {
-                    continue;
-                }
-            }
-
-            if ($sectionnum > $numsections) {
-                // Activities inside this section are 'orphaned', this section will be printed as 'stealth' below.
-                if (!empty($modinfo->sections[$sectionnum])) {
-                    $stealthsections[] = $section->export_for_template($output);
-                }
-                continue;
-            }
-
-            if (!$format->is_section_visible($thissection)) {
-                continue;
-            }
-
-
-            $sections[] = $section->export_for_template($output);
-        }
-
-        if (!empty($stealthsections)) {
-            $sections = array_merge($sections, $stealthsections);
-        }
-
-        return $sections;
-    }
-
-    /**
-     * Return params for url
-     *
-     * @return void|null
-     * @throws \coding_exception
-     * @throws \core\exception\coding_exception
-     * @throws \dml_exception
-     */
-    private function get_param_for_url()
-    {
-        global $PAGE, $DB;
-
-        $section_select = null;
-
-        $id = optional_param('id', null, PARAM_INT);
-        //If its url view course, return null
-        if ($PAGE->url->out_as_local_url(false) === '/course/view.php?id=' . $id) {
-            return null;
-        } elseif ($PAGE->url->out_as_local_url(false) === '/course/section.php?id=' . $id) {
-            $section_select = $DB->get_record('course_sections', ['id' => $id], '*', MUST_EXIST);
-            //Check if its subsection
-            if ($section_select->component == "mod_subsection") {
-                $sql = "SELECT module.section
-    FROM {course_sections} AS section
-    INNER JOIN {subsection} AS subsection ON section.itemid = subsection.id
-    INNER JOIN {course_modules} AS module ON subsection.id = module.instance
-    INNER JOIN {modules} AS allmodules ON module.module = allmodules.id
-    WHERE section.id = :sectionid AND allmodules.name = :modulename
-";
-                $params = array('sectionid' => $id, 'modulename' => 'subsection');
-
-                $result = $DB->get_record_sql($sql, $params);
-                $section_select = $DB->get_record('course_sections', ['id' => $result->section], '*', MUST_EXIST)->section;
-                self::save_last_section_access($this->format->get_course()->id, $section_select);
-                $this->subsectionselectd = true;
-            } else {
-                $section_select = $section_select->section;
-            }
-        }
-
-        $this->section_select = $section_select;
-    }
-
-    /**
-     * Save the last section
-     *
-     * @param $courseid
-     * @param $section
-     * @return void
-     */
-    static function save_last_section_access($courseid, $section)
-    {
-        global $USER;
-        $cache = cache::make('format_buttons', 'user_last_section');
-        $cache->set($USER->id . '_' . $courseid, $section);
-    }
-
-    /**
-     * Return the last sections
-     *
-     * @param $courseid
-     * @return array|bool|float|int|mixed|\stdClass|string
-     * @throws \coding_exception
-     */
-    static function get_last_section_access($courseid)
-    {
-        global $USER;
-
-        $cache = cache::make('format_buttons', 'user_last_section');
-        $section = $cache->get($USER->id . '_' . $courseid);
-        if (!$section) {
-            $section = 1;
-        }
-        return $section;
-    }
-
-    /**
-     * Rewrite function
-     *
-     * @param course_modinfo $modinfo
-     * @return array|section_info[]
-     * @throws \moodle_exception
-     */
-    protected function get_sections_to_display(\course_modinfo $modinfo): array
-    {
-        $singlesection = $this->format->get_sectionnum() ?? 0;
-
-        if ($singlesection) {
-            return [
-                $modinfo->get_section_info(0),
-                $modinfo->get_section_info($singlesection),
-            ];
-        }
-
-        return $modinfo->get_section_info_all();
-    }
-
-    /**
-     * Return section with the lowercase its selected
-     *
-     * @param array $array_sections
-     * @return array
-     */
-    private function leter_lowercase(array $array_sections)
-    {
-        $count = 0;
-        $format = $this->format;
-        $course = $format->get_course();
-        foreach ($array_sections as $array_section) {
-
-            if (empty($array_section->namesection) && !$course->section_zero_ubication) continue;
-            $array_section->namesection = $this->convert_lowercase_letter($count, 'a');
-            $count++;
-        }
-
-        return $array_sections;
-    }
-
-    /**
-     * Return leter in lowercase
+     * Convert leter in lowercase
      *
      * @param $num
      * @param $baseChar
@@ -540,29 +383,8 @@ class content extends content_base
         return $letters;
     }
 
-
     /**
-     * Return section when uppercase its active
-     *
-     * @param array $array_sections
-     * @return array
-     */
-    private function leter_uppercase(array $array_sections)
-    {
-        $count = 0;
-        $format = $this->format;
-        $course = $format->get_course();
-        foreach ($array_sections as $array_section) {
-            if (empty($array_section->namesection) && !$course->section_zero_ubication) continue;
-            $array_section->namesection = $this->convert_uppercase_letter($count);
-            $count++;
-        }
-
-        return $array_sections;
-    }
-
-    /**
-     * Return param to the uppercase letter
+     * Leter uppercase
      *
      * @param $num
      * @return string
@@ -579,9 +401,8 @@ class content extends content_base
         return $letters;
     }
 
-
     /**
-     * Array with roman numbers
+     * Get numbers in roman
      *
      * @return string[]
      */
@@ -607,26 +428,44 @@ class content extends content_base
     }
 
     /**
-     * Return sections when roman numbers is active
+     * Return namesection for btn
      *
-     * @param array $array_sections
-     * @return array
+     * @param $count
+     * @param $course
+     * @return mixed|string
      */
-    private function roman_numbers(array $array_sections)
+    public function get_namesection_for_btn($count, $course)
     {
-        $options = $this->get_numbers_in_roman();
-        $count = 1;
-        $format = $this->format;
-        $course = $format->get_course();
-        foreach ($array_sections as $array_section) {
+        switch ($course->selectoption) {
+            case "number";
+                //If number its default
+                break;
+            case 'leter_lowercase':
+                $count--;
+                do {
+                    $letters = chr(($count % 26) + ord('a')) . $letters;
+                    $count = intval($count / 26) - 1;
+                } while ($count >= 0);
+                $count = $letters;
+                break;
+            case 'leter_uppercase':
+                $count--;
+                do {
+                    $letters = chr(($count % 26) + ord('A')) . $letters;
+                    $count = intval($count / 26) - 1;
+                } while ($count >= 0);
 
-            if (empty($array_section->namesection) && !$course->section_zero_ubication) continue;
 
-            $array_section->namesection = $options[$count];
-            $count++;
+                $count = $letters;
+                break;
+            case 'roman_numbers':
+                $count = $this->get_numbers_in_roman()[$count];
+                break;
+            default:
+                //If not option, Its default
+                break;
         }
-
-        return $array_sections;
+        return $count;
     }
 
     /**
@@ -672,40 +511,4 @@ class content extends content_base
         }
     }
 
-    /**
-     * Get array sections
-     *
-     * @param mixed $section_prev
-     * @param bool|stdClass|null $course
-     * @param array $array_sections
-     * @return array
-     * @throws \coding_exception
-     */
-    public function get_array_sections($all_sections, $section_prev, $course, $array_sections)
-    {
-        //Check that section, if btween total sections
-        $maxindex = count($all_sections) - 1;
-        if ($this->section_select > $maxindex || $section_prev > $maxindex) {
-            $this->section_select = 0;
-            self::save_last_section_access($course->id, null);
-        }
-
-        if (!is_null($this->section_select)) {
-            if ($this->section_select == "0" && !$course->section_zero_ubication) {
-                if (isset($array_sections[1])) {
-                    $array_sections[1]->selected = true;
-                    self::save_last_section_access($course->id, 1);
-                }
-            } else {
-                $array_sections[$this->section_select]->selected = true;
-                self::save_last_section_access($course->id, $this->section_select);
-            }
-        } else {
-            $section = self::get_last_section_access($course->id);
-            if ($section && isset($array_sections[$section])) {
-                $array_sections[$section]->selected = true;
-            }
-        }
-        return $array_sections;
-    }
 }
