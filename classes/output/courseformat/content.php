@@ -64,7 +64,9 @@ class content extends content_base
 
         parent::__construct($format);
 
+        $this->sectionclass = 'format_buttons\\output\\courseformat\\content\\section';
         $this->sectionselectorclass = 'format_buttons\\output\\courseformat\\content\\sectionselector';
+        $this->sectionnavigationclass = 'format_buttons\\output\\courseformat\\content\\sectionnavigation';
 
         //rounded btns
         $this->form_btn = match ($format->get_course()->selectform) {
@@ -122,9 +124,6 @@ class content extends content_base
         $format->set_sectionnum(null);
 
         $this->save_last_section_access($this->selected_section);
-
-        $this->sectionselectorclass = 'format_buttons\\output\\courseformat\\content\\sectionselector';
-        $this->sectionnavigationclass = 'format_buttons\\output\\courseformat\\content\\sectionnavigation';
 
         $data = (object)[
             'title' => $format->page_title(), // This method should be in the course_format class.

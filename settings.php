@@ -20,14 +20,14 @@ if ($ADMIN->fulltree) {
         'format_buttons/fontcolor',
         get_string('fontcolor', 'format_buttons'),
         get_string('fontcolor_desc', 'format_buttons'),
-        '#FFFFFF' // Default value.
+        '#FFFFFF'
     ));
 
     $settings->add(new admin_setting_configcolourpicker(
         'format_buttons/bgcolor',
         get_string('bgcolor', 'format_buttons'),
         get_string('bgcolor_desc', 'format_buttons'),
-        '#4d2433' // Default value.
+        '#4d2433'
     ));
 
     $options = array(
@@ -41,7 +41,7 @@ if ($ADMIN->fulltree) {
         'format_buttons/selectoption',
         get_string('numeretion', 'format_buttons'),
         get_string('numeretion_desc', 'format_buttons'),
-        'option1', // Default value.
+        'option1',
         $options
     ));
 
@@ -49,14 +49,14 @@ if ($ADMIN->fulltree) {
         'format_buttons/fontcolor_selected',
         get_string('fontcolor_selected', 'format_buttons'),
         get_string('fontcolor_selected_desc', 'format_buttons'),
-        '#e7e7e7' // Default value.
+        '#e7e7e7'
     ));
 
     $settings->add(new admin_setting_configcolourpicker(
         'format_buttons/bgcolor_selected',
         get_string('bgcolor_selected', 'format_buttons'),
         get_string('bgcolor_selected_desc', 'format_buttons'),
-        '#959494' // Default value.
+        '#959494'
     ));
 
     $settings->add(new admin_setting_configstoredfile(

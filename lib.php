@@ -216,7 +216,7 @@ class format_buttons extends core_courseformat\base
             'help' => 'title_section_view',
             'help_component' => 'format_buttons',
             'element_type' => 'select',
-            'default' => '0',
+            'default' => '1',
             'element_attributes' => array(
                 array(
                     '0' => get_string('no'),
