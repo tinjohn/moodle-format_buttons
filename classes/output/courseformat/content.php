@@ -27,12 +27,14 @@ namespace format_buttons\output\courseformat;
 
 defined('MOODLE_INTERNAL') || die();
 
+use cache;
 use context_course;
 use core\exception\moodle_exception;
 use core_courseformat\base as course_format;
 use core_courseformat\output\local\content as content_base;
 use moodle_url;
 use stdClass;
+use TypeError;
 
 
 class content extends content_base
@@ -58,28 +60,42 @@ class content extends content_base
      */
     public function __construct(course_format $format)
     {
+        global $DB;
+
         parent::__construct($format);
 
-        $this->set_array_sections();
+        $this->sectionselectorclass = 'format_buttons\\output\\courseformat\\content\\sectionselector';
+
         //rounded btns
-        switch ($format->get_course()->selectform) {
-            case 'rounded':
-                $this->form_btn = "50%";
-                break;
-            default:
-                $this->form_btn = "0%";
-                break;
+        $this->form_btn = match ($format->get_course()->selectform) {
+            'rounded' => "50%",
+            default => "0%",
+        };
+
+
+        global $DB;
+
+        $section = $this->get_last_section_access();
+        if ($section) {
+            $verified_exist = $DB->get_record('course_sections', ['section' => $section,
+                'course' => $this->format->get_course()->id, 'component' => null]);
         }
-        if ($format->get_sectionnum()) {
-            $this->selected_section = $format->get_sectionnum();
-            $format->set_sectionnum(null);
+        if ($this->format->get_sectionid() != null) {
+            $this->selected_section = $this->format->get_sectionnum();
         } else {
-            if ($format->get_course()->section_zero_ubication) {
+            if ($verified_exist) {
+                $this->selected_section = $section;
+            }
+        }
+        if ($this->selected_section == null) {
+            if ($this->format->get_course()->section_zero_ubication) {
                 $this->selected_section = 0;
             } else {
                 $this->selected_section = 1;
             }
         }
+        $this->set_array_sections();
+
     }
 
     /**
@@ -104,6 +120,11 @@ class content extends content_base
     {
         $format = $this->format;
         $format->set_sectionnum(null);
+
+        $this->save_last_section_access($this->selected_section);
+
+        $this->sectionselectorclass = 'format_buttons\\output\\courseformat\\content\\sectionselector';
+        $this->sectionnavigationclass = 'format_buttons\\output\\courseformat\\content\\sectionnavigation';
 
         $data = (object)[
             'title' => $format->page_title(), // This method should be in the course_format class.
@@ -134,6 +155,11 @@ class content extends content_base
         if ($file_setting != "") {
             $data->image_init_sectios = $this->get_content_file('format_buttons_file', get_config('format_buttons', 'image_sections'));
         }
+        //navigation
+        $sectionnavigation = new $this->sectionnavigationclass($format, $this->selected_section);
+        $data->sectionnavigation = $sectionnavigation->export_for_template($output);
+        $sectionselector = new $this->sectionselectorclass($format, $sectionnavigation);
+        $data->sectionselector = $sectionselector->export_for_template($output);
 
         return $data;
     }
@@ -203,7 +229,7 @@ class content extends content_base
                 $info->body = true;
             }
             //Ad class selected
-            if ($section->section == $format->get_sectionnum()) {
+            if ($section->section == $this->selected_section) {
                 $info->selected = true;
             }
 
@@ -510,5 +536,33 @@ class content extends content_base
             return "";
         }
     }
+
+    /**
+     * Save the requested sections
+     *
+     * @param $section
+     * @return void
+     */
+    public function save_last_section_access($section)
+    {
+        global $USER;
+        $cache = cache::make('format_buttons', 'user_last_section');
+        $cache->set($USER->id . '_' . $this->format->get_course()->id, $section);
+    }
+
+    /**
+     * Return the requested sections
+     *
+     * @return array|bool|float|int|mixed|\stdClass|string
+     * @throws \coding_exception
+     */
+    public function get_last_section_access()
+    {
+        global $USER;
+
+        $cache = cache::make('format_buttons', 'user_last_section');
+        return $cache->get($USER->id . '_' . $this->format->get_course()->id);
+    }
+
 
 }

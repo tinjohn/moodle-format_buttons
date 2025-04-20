@@ -48,6 +48,7 @@ class section extends section_base
         parent::__construct($format, $section);
 
         $this->headerclass = 'format_buttons\\classes\\output\\courseformat\\content\\section\\header';
+
     }
 
     /**

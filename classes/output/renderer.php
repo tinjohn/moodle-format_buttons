@@ -50,6 +50,5 @@ class renderer extends core_section_renderer
         $renderable = new $classname($format, $section);
         return $this->render($renderable);
     }
-
 }
 

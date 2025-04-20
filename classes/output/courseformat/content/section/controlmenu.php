@@ -44,7 +44,7 @@ class controlmenu extends controlmenu_format_topics
     }
 
     /**
-     * Itemst to the controlmenu
+     * Items to the controlmenu
      *
      * @return array
      */

@@ -227,6 +227,12 @@
         {{/ core_courseformat/local/content/bulkedittools}}
     {{/bulkedittools}}
 </div>
+{{#sectionselector}}
+    {{$ format_buttons/local/content/sectionselector }}
+        {{> format_buttons/local/content/sectionselector }}
+    {{/ format_buttons/local/content/sectionselector }}
+{{/sectionselector}}
+
 {{#js}}
     require(['core_courseformat/local/content'], function(component) {
     component.init('#page', {}, {{sectionreturn}});
