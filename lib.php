@@ -311,6 +311,31 @@ class format_buttons extends core_courseformat\base
     {
         return true;
     }
+
+    /**
+     * Function taken from format_topics
+     *
+     * @param $mform
+     * @param $forsection
+     * @return array
+     * @throws dml_exception
+     */
+    public function create_edit_form_elements(&$mform, $forsection = false) {
+        global $COURSE;
+        $elements = parent::create_edit_form_elements($mform, $forsection);
+
+        if (!$forsection && (empty($COURSE->id) || $COURSE->id == SITEID)) {
+            // Custom sections are always created with the default number of sections.
+            $courseconfig = get_config('moodlecourse');
+            $element = $mform->addElement('hidden', 'numsections');
+            $mform->setType('numsections', PARAM_INT);
+            $mform->setDefault('numsections', $courseconfig->numsections);
+            array_unshift($elements, $element);
+        }
+
+        return $elements;
+    }
+
 }
 
 /**
