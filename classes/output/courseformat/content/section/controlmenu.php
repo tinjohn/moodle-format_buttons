@@ -27,6 +27,11 @@ namespace format_buttons\classes\output\courseformat\content\section;
 
 defined('MOODLE_INTERNAL') || die();
 
+use core\exception\moodle_exception;
+use core\output\action_menu\link;
+use core\output\action_menu\link_secondary;
+use core\output\pix_icon;
+use core\url;
 use format_topics\output\courseformat\content\section\controlmenu as controlmenu_format_topics;
 
 
@@ -47,6 +52,8 @@ class controlmenu extends controlmenu_format_topics
      * Items to the controlmenu
      *
      * @return array
+     * @throws \coding_exception
+     * @throws moodle_exception
      */
     public function section_control_items()
     {
@@ -65,5 +72,24 @@ class controlmenu extends controlmenu_format_topics
         $controls['delete'] = $this->get_section_delete_item();
 
         return $controls;
+    }
+
+    /**
+     * Takes from parent class
+     *
+     * @throws moodle_exception
+     * @throws \coding_exception
+     */
+    protected function get_section_view_item(): ?link {
+        // Only show the view link if we are not already in the section view page.
+        if ($this->format->get_sectionid() == $this->section->id) {
+            return null;
+        }
+        return new link_secondary(
+            url: new url('/course/section.php', ['id' => $this->section->id]),
+            icon: new pix_icon('i/viewsection', ''),
+            text: get_string('view'),
+            attributes: ['class' => 'view'],
+        );
     }
 }
