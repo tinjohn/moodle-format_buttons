@@ -26,6 +26,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'format_buttons';
 $plugin->release = '5.x';
-$plugin->version = 2025070300;
+$plugin->version = 2025070400;
 $plugin->requires = 2024100700.00;
 $plugin->maturity = MATURITY_STABLE;
