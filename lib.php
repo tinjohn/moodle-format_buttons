@@ -24,6 +24,9 @@ use core\output\inplace_editable;
  */
 class format_buttons extends core_courseformat\base
 {
+    /**
+     * @throws moodle_exception
+     */
     protected function __construct($format, $courseid)
     {
         parent::__construct($format, $courseid);
@@ -37,7 +40,6 @@ class format_buttons extends core_courseformat\base
             // Compatibilidade com Moodle 4.3 e versões anteriores.
             $this->set_section_number(0);
         }
-
     }
 
     /**
