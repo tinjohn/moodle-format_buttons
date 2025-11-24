@@ -95,3 +95,22 @@ $string['color_gruping'] = 'Color for the buttons of the group {$a}';
 $string['title_gruping_help'] = 'Text is placed before the group';
 $string['sections_gruping'] = 'Number of sections for the group {$a}';
 $string['sections_gruping_help']='Number of sections that group contain';
+
+// ADDED tinjohn 24112025.
+$string['usebottommenu'] = 'Show bottom menu';
+$string['usebottommenu_help'] = 'An additional navigation menu at the end of each section.';
+$string['displayh5picons'] = 'Display (yes) h5p icon';
+$string['displayh5picons_help'] = "(no) hides the h5p icon and link in the course while not in editing mode. Useful for embedded h5p contents within it's own description, that is thus not able to be hidden.";
+$string['act_complinfo_position'] = 'Display completion info';
+$string['act_complinfo_position_help'] = "Completion information or marks are displayed (per default) next to the headline of the activity. Choose below to change the position.";
+$string['below_act'] = "below activity";
+$string['above_act'] = "above activity";
+$string['highlight'] = "highlight section";
+$string['hililast_help'] = "Highlight color -current- configured at the end of the option list is the color to be used for the choosen button overall.";
+$string['hililast'] = "highlight last section";
+$string['hililast_help'] = "Highlight color -current- configured at the end of the option list is the color to be used for the last button overall.";
+
+$string['divisorsinglebuttext'] = "label of single button";
+$string['divisorsinglebuttext_help'] = "Groups containing one button only will get the label &bull;&bull;&bull; because numbering is inapproiate in this case. Choose a short string you like to see in the button.";
+// END ADDED.
+
