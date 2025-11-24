@@ -186,7 +186,7 @@ class format_buttons extends core_courseformat\base
             'element_type' => 'text',
             'default' => get_config('format_buttons', 'fontcolor_selected')
         );
-
+        
         $opt = get_config('format_buttons', 'selectoption');
         $courseformatoptionsedit['selectoption'] = array(
             'label' => get_string('selectoption', 'format_buttons'),
@@ -246,6 +246,77 @@ class format_buttons extends core_courseformat\base
             )
         );
 
+            // ADDED tinjohn 2022-07-29
+            // Option for bottom menu - defaults no.
+            $courseformatoptionsedit['usebottommenu'] = array(
+                'label' => get_string('usebottommenu', 'format_buttons'),
+                'help' => 'usebottommenu',
+                'help_component' => 'format_buttons',
+                'element_type' => 'select',
+                'default' => get_config('format_buttons', 'usebottommenu'),
+                'element_attributes' => array(
+                    array(
+                        0 => get_string('yes', 'format_buttons'),
+                        1 => get_string('no', 'format_buttons'),
+                    ),
+                ),
+            );
+
+            // For h5picon displayed for users.
+            $courseformatoptionsedit['displayh5picons'] = array(
+                'label' => get_string('displayh5picons', 'format_buttons'),
+                'help' => 'displayh5picons',
+                'help_component' => 'format_buttons',
+                'element_type' => 'select',
+                'default' => get_config('format_buttons', 'displayh5picons'),
+                'element_attributes' => array(
+                    array(
+                        0 => get_string('no', 'format_buttons'),
+                        1 => get_string('yes', 'format_buttons'),
+                    ),
+                ),
+            );
+
+            // 20222609 act_complinfo_below.
+            $courseformatoptionsedit['act_complinfo_position'] = array(
+                'label' => get_string('act_complinfo_position', 'format_buttons'),
+                'help' => 'act_complinfo_position',
+                'help_component' => 'format_buttons',
+                'element_type' => 'select',
+                'default' => get_config('format_buttons', 'act_complinfo_position'),
+                'element_attributes' => array(
+                    array(
+                      0 => get_string('below_act', 'format_buttons'),
+                      1 => get_string('above_act', 'format_buttons'),
+                    ),
+                ),
+            );
+
+            $courseformatoptionsedit['hililast'] = array(
+                'label' => get_string('hililast', 'format_buttons'),
+                'help' => 'hililast',
+                'help_component' => 'format_buttons',
+                'element_type' => 'select',
+                'default' => get_config('format_buttons', 'hililast'),
+                'element_attributes' => array(
+                    array(
+                      0 => get_string('yes', 'format_buttons'),
+                      1 => get_string('no', 'format_buttons'),
+                    ),
+                ),
+            );
+            $courseformatoptionsedit['hilight'] = array(
+                'label' => get_string('highlight', 'format_buttons'),
+                'element_type' => 'select',
+                'default' => get_config('format_buttons', 'hilight'),
+                'element_attributes' => array($sectionmenu),
+            );
+
+
+
+            // END ADDED.
+
+
         $max_groups = get_config('format_buttons', 'max_groups');
         if ($max_groups != 0) {
             $max_sections = $this->get_max_sections();
@@ -276,6 +347,16 @@ class format_buttons extends core_courseformat\base
                     'help_component' => 'format_buttons',
                     'element_type' => 'text',
                 );
+
+                // ADDED Tina john 2023-03-15.
+                $courseformatoptionsedit['divisorsinglebuttext'.($i + 1)] = array(
+                    'label' => get_string('divisorsinglebuttext', 'format_buttons', $i + 1),
+                    'help' => 'divisorsinglebuttext',
+                    'help_component' => 'format_buttons',
+                    'default' => "&bull;&bull;&bull;",
+                    'element_type' => 'text',
+                );
+                // END ADDED.
             }
         }
 
